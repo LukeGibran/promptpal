@@ -8,13 +8,13 @@ import {
 } from "firebase/firestore/lite";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCjwOdJHHduO4pdAQKtdur2ABFSWizC9K4",
-  authDomain: "promptme-7b9d8.firebaseapp.com",
-  projectId: "promptme-7b9d8",
-  storageBucket: "promptme-7b9d8.appspot.com",
-  messagingSenderId: "100664264545",
-  appId: "1:100664264545:web:4a3e6022cdde2fbb1ea720",
-  measurementId: "G-GRB47HM4BQ",
+  apiKey: process.env.FIREBASE_API_KEY,
+  authDomain: process.env.FIREBASE_AUTH_DOMAIN,
+  projectId: process.env.FIREBASE.PROJECT_ID,
+  storageBucket: process.env.FIREBASE.STORAGE_BUCKET,
+  messagingSenderId: process.env.FIREBASE.MESSAGING_SENDER_ID,
+  appId: process.env.FIREBASE_APP_ID,
+  measurementId: process.env.FIREBASE_MEASUREMENT_ID,
 };
 
 // Initialize Firebase

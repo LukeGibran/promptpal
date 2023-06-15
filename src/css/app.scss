@@ -1,1 +1,56 @@
 // app global css in SCSS form
+@font-face {
+  font-family: LeagueSpartan;
+  src: url(./fonts/LeagueSpartan.ttf);
+}
+
+.league-spartan {
+  font-family: "LeagueSpartan";
+}
+
+* {
+  font-family: "LeagueSpartan";
+  font-weight: 600;
+}
+
+.custom-submenu-box {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #ef933a;
+    color: #fff;
+  }
+
+  &.active {
+    background-color: #ef933a;
+    color: #fff;
+  }
+}
+
+.prompt-color {
+  color: #ef933a;
+}
+
+.pal-color {
+  color: #398492;
+}
+
+/* width */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #fff;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #e7e5b7;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: darken(#e7e5b7, 10);
+}

@@ -23,6 +23,7 @@ export const useMenuStore = defineStore("menu", {
         await addDoc(ref, data);
         Notify.create({
           message: "Menu Added Successfully!",
+          color: "positive",
           position: "top-right",
         });
         this.menus.push(this.menu);
@@ -30,6 +31,7 @@ export const useMenuStore = defineStore("menu", {
         console.log(error);
         Notify.create({
           message: "Something went wrong. Please try again",
+          color: "negative",
           position: "top-right",
         });
       } finally {
@@ -51,6 +53,7 @@ export const useMenuStore = defineStore("menu", {
         console.log(error);
         Notify.create({
           message: "Something went wrong. Please try again",
+          color: "negative",
           position: "top-right",
         });
       } finally {
@@ -66,6 +69,7 @@ export const useMenuStore = defineStore("menu", {
           await addDoc(ref, data);
           Notify.create({
             message: "Sub Menu Added Successfully!",
+            color: "positive",
             position: "top-right",
           });
           this.subMenus.push(data);
@@ -74,6 +78,7 @@ export const useMenuStore = defineStore("menu", {
           console.log(error);
           Notify.create({
             message: "Something went wrong. Please try again",
+            color: "negative",
             position: "top-right",
           });
           rej();
@@ -96,6 +101,7 @@ export const useMenuStore = defineStore("menu", {
         console.log(error);
         Notify.create({
           message: "Something went wrong. Please try again",
+          color: "negative",
           position: "top-right",
         });
       } finally {

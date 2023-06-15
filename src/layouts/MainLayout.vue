@@ -1,7 +1,7 @@
 <template>
   <q-layout view="lHh Lpr lFf">
-    <q-header elevated>
-      <q-toolbar>
+    <q-header>
+      <q-toolbar class="bg-white">
         <!-- <q-btn
           flat
           dense
@@ -11,9 +11,16 @@
           @click="toggleLeftDrawer"
         /> -->
 
-        <q-toolbar-title> PromptPal </q-toolbar-title>
-        <q-btn flat label="Home" to="/" />
-        <q-btn flat label="Add" to="add" />
+        <router-link to="/">
+          <q-img
+            src="~assets/logo.png"
+            style="height: 75px; width: 130px"
+            fit="scale-down"
+          />
+        </router-link>
+        <q-toolbar-title class="text-dark"> </q-toolbar-title>
+        <q-btn class="text-info" flat label="Home" to="/" />
+        <q-btn class="text-primary" flat label="Add" to="add" />
       </q-toolbar>
     </q-header>
 
@@ -37,7 +44,13 @@
       </q-list>
     </q-drawer> -->
 
-    <q-page-container>
+    <q-page-container
+      style="
+        background: url('src/assets/patternpad3.svg');
+        background-repeat: repeat-x;
+        background-position: bottom center;
+      "
+    >
       <router-view />
     </q-page-container>
   </q-layout>

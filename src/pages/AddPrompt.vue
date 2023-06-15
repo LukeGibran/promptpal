@@ -4,148 +4,160 @@
       <div class="row">
         <div class="col-md-6 offset-md-3">
           <div class="row">
-            <div class="col-12">
-              <q-form>
-                <h4>Add Menu</h4>
-                <q-input
-                  outlined
-                  v-model="menu"
-                  label="Menu"
-                  lazy-rules
-                  class="q-mb-sm"
-                />
-                <div>
-                  <q-btn
-                    label="Add"
-                    type="submit"
-                    color="primary"
-                    :loading="loading"
-                    :disable="!menu"
-                    @click.prevent="addMenu()"
-                  />
-                </div>
-              </q-form>
+            <div class="col-12 q-mb-lg">
+              <q-card class="no-shadow" style="border: 1px solid #ccc">
+                <q-card-section>
+                  <q-card-main>
+                    <q-form>
+                      <div class="text-h4 q-mb-md">Add Menu</div>
+                      <q-input
+                        outlined
+                        v-model="menu"
+                        label="Menu"
+                        lazy-rules
+                        class="q-mb-sm"
+                      />
+                      <div>
+                        <q-btn
+                          label="Add"
+                          type="submit"
+                          color="primary"
+                          :loading="loading"
+                          :disable="!menu"
+                          @click.prevent="addMenu()"
+                        />
+                      </div>
+                    </q-form>
+                  </q-card-main>
+                </q-card-section>
+              </q-card>
             </div>
 
             <div class="col-12">
-              <h4>Add Sub Menu</h4>
-              <q-form>
-                <q-select
-                  outlined
-                  v-model="menuType"
-                  label="Menu Type"
-                  :loading="loadingMenus"
-                  :options="menus"
-                  class="q-pb-md"
-                />
+              <q-card class="no-shadow" style="border: 1px solid #ccc">
+                <q-card-section>
+                  <q-card-main>
+                    <div class="text-h4 q-mb-md">Add Sub Menu</div>
+                    <q-form>
+                      <q-select
+                        outlined
+                        v-model="menuType"
+                        label="Menu Type"
+                        :loading="loadingMenus"
+                        :options="menus"
+                        class="q-pb-md"
+                      />
 
-                <q-input
-                  outlined
-                  v-model="subMenu"
-                  label="SubMenu Title"
-                  lazy-rules
-                  class="q-pb-md"
-                />
+                      <q-input
+                        outlined
+                        v-model="subMenu"
+                        label="SubMenu Title"
+                        lazy-rules
+                        class="q-pb-md"
+                      />
 
-                <q-input
-                  outlined
-                  v-model="prompt"
-                  label="Prompt"
-                  type="textarea"
-                  lazy-rules
-                  class="q-pb-md"
-                />
+                      <q-input
+                        outlined
+                        v-model="prompt"
+                        label="Prompt"
+                        type="textarea"
+                        lazy-rules
+                        class="q-pb-md"
+                      />
 
-                <q-select
-                  outlined
-                  v-model="numberOfInput"
-                  :options="inputNumbers"
-                  label="Number of Inputs"
-                  class="q-pb-md"
-                />
+                      <q-select
+                        outlined
+                        v-model="numberOfInput"
+                        :options="inputNumbers"
+                        label="Number of Inputs"
+                        class="q-pb-md"
+                      />
 
-                <div v-if="numberOfInput">
-                  <div v-if="numberOfInput >= 1">
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="input1"
-                      label="Keyword 1"
-                      outlined
-                    ></q-input>
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="hint1"
-                      label="Hint for keyword 1"
-                      outlined
-                    ></q-input>
-                  </div>
-                  <div v-if="numberOfInput >= 2">
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="input2"
-                      label="Keyword 2"
-                      outlined
-                    ></q-input>
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="hint2"
-                      label="Hint for keyword 2"
-                      outlined
-                    ></q-input>
-                  </div>
-                  <div v-if="numberOfInput >= 3">
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="input3"
-                      label="Keyword 3"
-                      outlined
-                    ></q-input>
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="hint3"
-                      label="Hint for keyword 3"
-                      outlined
-                    ></q-input>
-                  </div>
-                  <div v-if="numberOfInput >= 4">
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="input4"
-                      label="Keyword 4"
-                      outlined
-                    ></q-input>
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="hint4"
-                      label="Hint for keyword 4"
-                      outlined
-                    ></q-input>
-                  </div>
-                  <div v-if="numberOfInput >= 5">
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="input5"
-                      label="Keyword 5"
-                      outlined
-                    ></q-input>
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="hint5"
-                      label="Hint for keyword 5"
-                      outlined
-                    ></q-input>
-                  </div>
-                </div>
-                <div>
-                  <q-btn
-                    label="Add"
-                    type="submit"
-                    color="primary"
-                    :loading="addingSubMenu"
-                    @click.prevent="submitSubMenu()"
-                  />
-                </div>
-              </q-form>
+                      <div v-if="numberOfInput">
+                        <div v-if="numberOfInput >= 1">
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="input1"
+                            label="Keyword 1"
+                            outlined
+                          ></q-input>
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="hint1"
+                            label="Hint for keyword 1"
+                            outlined
+                          ></q-input>
+                        </div>
+                        <div v-if="numberOfInput >= 2">
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="input2"
+                            label="Keyword 2"
+                            outlined
+                          ></q-input>
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="hint2"
+                            label="Hint for keyword 2"
+                            outlined
+                          ></q-input>
+                        </div>
+                        <div v-if="numberOfInput >= 3">
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="input3"
+                            label="Keyword 3"
+                            outlined
+                          ></q-input>
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="hint3"
+                            label="Hint for keyword 3"
+                            outlined
+                          ></q-input>
+                        </div>
+                        <div v-if="numberOfInput >= 4">
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="input4"
+                            label="Keyword 4"
+                            outlined
+                          ></q-input>
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="hint4"
+                            label="Hint for keyword 4"
+                            outlined
+                          ></q-input>
+                        </div>
+                        <div v-if="numberOfInput >= 5">
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="input5"
+                            label="Keyword 5"
+                            outlined
+                          ></q-input>
+                          <q-input
+                            class="q-mb-sm"
+                            v-model="hint5"
+                            label="Hint for keyword 5"
+                            outlined
+                          ></q-input>
+                        </div>
+                      </div>
+                      <div>
+                        <q-btn
+                          label="Add"
+                          type="submit"
+                          color="primary"
+                          :loading="addingSubMenu"
+                          @click.prevent="submitSubMenu()"
+                        />
+                      </div>
+                    </q-form>
+                  </q-card-main>
+                </q-card-section>
+              </q-card>
             </div>
           </div>
         </div>

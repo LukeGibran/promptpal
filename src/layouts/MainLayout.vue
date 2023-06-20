@@ -2,15 +2,6 @@
   <q-layout view="lHh Lpr lFf">
     <q-header>
       <q-toolbar class="bg-white">
-        <!-- <q-btn
-          flat
-          dense
-          round
-          icon="menu"
-          aria-label="Menu"
-          @click="toggleLeftDrawer"
-        /> -->
-
         <router-link to="/">
           <q-img
             src="~assets/logo.png"
@@ -18,39 +9,102 @@
             fit="scale-down"
           />
         </router-link>
+        <div class="q-mx-lg"></div>
+        <router-link to="/">
+          <q-btn class="text-info" flat label="Home" />
+        </router-link>
+        <router-link to="">
+          <q-btn class="text-primary" flat label="Terms & Service" />
+        </router-link>
         <q-toolbar-title class="text-dark"> </q-toolbar-title>
-        <q-btn class="text-info" flat label="Home" to="/" />
-        <q-btn class="text-primary" flat label="Add" to="add" />
+        <div
+          class="custom-border credit-border"
+          :class="
+            user?.data?.credits
+              ? 'text-positive active'
+              : 'text-negative inactive'
+          "
+          v-if="user.data && user.loggedIn"
+        >
+          <i class="material-icons">generating_tokens</i> Credits:
+          {{ user?.data?.credits }}
+        </div>
+        <div class="custom-border credit-border free">
+          <i class="material-icons">generating_tokens</i> Free Credits: 3
+        </div>
+        <q-btn
+          v-if="!user.loggedIn"
+          class="text-info"
+          flat
+          label="Login"
+          to="login"
+        />
+        <q-btn
+          v-if="!user.loggedIn"
+          class="text-primary"
+          flat
+          label="Register"
+          to="register"
+        />
+        <q-btn-dropdown
+          v-if="user.loggedIn && user.data"
+          text-color="dark"
+          flat
+          :label="user?.data.displayName"
+          icon="person"
+          class="q-mr-lg"
+          id="dropdown-menu"
+        >
+          <q-list>
+            <q-item @click="$router.push('profile')" clickable v-close-popup>
+              <q-item-section avatar>
+                <q-avatar
+                  icon="account_box"
+                  color="secondary"
+                  text-color="white"
+                  size="md"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label style="font-size: 16px">Profile</q-item-label>
+                <q-item-label caption>View Profile</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator v-if="user.data.role == 'admin'" />
+            <q-item v-if="user.data.role == 'admin'" clickable v-close-popup>
+              <q-item-section avatar>
+                <q-avatar
+                  icon="add"
+                  color="positive"
+                  text-color="white"
+                  size="md"
+                />
+              </q-item-section>
+              <q-item-section @click="$router.push('add')">
+                <q-item-label style="font-size: 16px">Add</q-item-label>
+                <q-item-label caption>Add new Menu/sub topic</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item clickable v-close-popup>
+              <q-item-section avatar>
+                <q-avatar
+                  icon="logout"
+                  color="negative"
+                  text-color="white"
+                  size="md"
+                />
+              </q-item-section>
+              <q-item-section @click="signOut()">
+                <q-item-label style="font-size: 16px">Signout</q-item-label>
+                <q-item-label caption>Signout from the app</q-item-label>
+              </q-item-section>
+            </q-item>
+          </q-list>
+        </q-btn-dropdown>
       </q-toolbar>
     </q-header>
-
-    <!-- <q-drawer
-      v-model="leftDrawerOpen"
-      show-if-above
-      bordered
-    >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
-
-        <EssentialLink
-          v-for="link in essentialLinks"
-          :key="link.title"
-          v-bind="link"
-        />
-      </q-list>
-    </q-drawer> -->
-
-    <q-page-container
-      style="
-        background: url('src/assets/patternpad3.svg');
-        background-repeat: repeat-x;
-        background-position: bottom center;
-      "
-    >
+    <q-page-container class="bg-app">
       <router-view />
     </q-page-container>
   </q-layout>
@@ -58,69 +112,35 @@
 
 <script>
 import { defineComponent, ref } from "vue";
-// import EssentialLink from "components/EssentialLink.vue";
-
-const linksList = [
-  {
-    title: "Docs",
-    caption: "quasar.dev",
-    icon: "school",
-    link: "https://quasar.dev",
-  },
-  {
-    title: "Github",
-    caption: "github.com/quasarframework",
-    icon: "code",
-    link: "https://github.com/quasarframework",
-  },
-  {
-    title: "Discord Chat Channel",
-    caption: "chat.quasar.dev",
-    icon: "chat",
-    link: "https://chat.quasar.dev",
-  },
-  {
-    title: "Forum",
-    caption: "forum.quasar.dev",
-    icon: "record_voice_over",
-    link: "https://forum.quasar.dev",
-  },
-  {
-    title: "Twitter",
-    caption: "@quasarframework",
-    icon: "rss_feed",
-    link: "https://twitter.quasar.dev",
-  },
-  {
-    title: "Facebook",
-    caption: "@QuasarFramework",
-    icon: "public",
-    link: "https://facebook.quasar.dev",
-  },
-  {
-    title: "Quasar Awesome",
-    caption: "Community Quasar projects",
-    icon: "favorite",
-    link: "https://awesome.quasar.dev",
-  },
-];
+import { auth } from "../utils/firebaseProxy";
+import { storeToRefs } from "pinia";
+import { useUserStore } from "stores/user";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "MainLayout",
-
-  // components: {
-  //   EssentialLink,
-  // },
-
   setup() {
-    const leftDrawerOpen = ref(false);
+    const userStore = useUserStore();
+    const { fetchUser, logOut, getUserData } = userStore;
+    const { user } = storeToRefs(userStore);
+    const router = useRouter();
+
+    auth.onAuthStateChanged(async (user) => {
+      if (user) {
+        await fetchUser(user);
+
+        await getUserData(user.uid);
+      }
+    });
+
+    async function signOut() {
+      await logOut();
+      router.push("/login");
+    }
 
     return {
-      essentialLinks: linksList,
-      leftDrawerOpen,
-      toggleLeftDrawer() {
-        leftDrawerOpen.value = !leftDrawerOpen.value;
-      },
+      user,
+      signOut,
     };
   },
 });

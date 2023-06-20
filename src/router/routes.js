@@ -1,5 +1,7 @@
-import ChatPage from "src/pages/ChatPage.vue";
 import AddPrompt from "src/pages/AddPrompt.vue";
+import LoginPage from "src/pages/LoginPage.vue";
+import RegisterPage from "src/pages/RegisterPage.vue";
+import ProfilePage from "src/pages/Profile.vue";
 
 const routes = [
   {
@@ -9,16 +11,29 @@ const routes = [
       {
         path: "",
         component: () => import("pages/IndexPage.vue"),
+        meta: { requiresAuth: true },
       },
       {
         path: "/add",
         component: AddPrompt,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "/profile",
+        component: ProfilePage,
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "/login",
+        component: LoginPage,
+        meta: { requiresAuth: false },
+      },
+      {
+        path: "/register",
+        component: RegisterPage,
+        meta: { requiresAuth: false },
       },
     ],
-  },
-  {
-    path: "/chat",
-    component: ChatPage,
   },
 
   // Always leave this as last one,

@@ -27,7 +27,8 @@
           v-if="selectedMenu"
           :items="selectedMenu.subMenus"
           v-slot="{ item, index }"
-          style="max-height: 400px"
+          class="q-pr-sm"
+          style="max-height: 450px"
         >
           <q-card
             :key="index"
@@ -39,7 +40,9 @@
           >
             <q-card-section>
               <q-card-main>
-                <div class="text-body1">{{ item.title }}</div>
+                <div style="font-size: 18px">
+                  {{ item.title }}
+                </div>
               </q-card-main>
             </q-card-section>
           </q-card>
@@ -86,8 +89,10 @@
                         name="PromptPal"
                         avatar="~/assets/logo_initial.png"
                         :text="[`${item.content}`]"
+                        :text-html="true"
                         text-color="white"
                         :bg-color="index % 2 === 0 ? 'secondary' : 'primary'"
+                        id="chat-messages"
                       >
                       </q-chat-message>
                       <div class="row justify-end">
@@ -110,7 +115,7 @@
           </q-card-section>
         </q-card>
         <q-card
-          class="no-shadow"
+          class="no-shadow q-mb-md"
           v-if="selectedPrompt.title"
           style="border: 1px solid #ccc"
         >
@@ -245,9 +250,6 @@
                   "
                   v-model="input3"
                   outlined
-                  {{
-                  typeWriterText
-                  }}
                   :disable="!selectedPrompt.title"
                 ></q-input>
                 <q-input
@@ -353,18 +355,22 @@ import { ref, defineComponent, onMounted, toRaw, onBeforeUnmount } from "vue";
 import { functions } from "src/utils/firebaseProxy";
 import { httpsCallable } from "firebase/functions";
 import { useMenuStore } from "stores/menu";
+import { useUserStore } from "stores/user";
 import { storeToRefs } from "pinia";
 import _startCase from "lodash/startCase";
 import _sortBy from "lodash/sortBy";
+import { useRouter } from "vue-router";
 
 export default defineComponent({
   name: "ChatPage",
   setup() {
+    const router = useRouter();
     const menuStore = useMenuStore();
-
     const { menus, subMenus } = storeToRefs(menuStore);
-
     const { getMenus, getSubMenus, gettingSubMenus } = menuStore;
+
+    const useStore = useUserStore();
+    const { user } = storeToRefs(useStore);
 
     const prompt = ref("");
     const input1 = ref("");
@@ -425,17 +431,29 @@ export default defineComponent({
       );
 
       try {
-        const res = await generatePromptResponse(prompt.value);
+        const res = await generatePromptResponse(
+          `${prompt.value}. Please have the response in a simple html format.`
+        );
         let date = Date.now();
         conversation.value.push({
           role: "assistant",
-          content: "",
+          content: res.data.choices[0].message.content,
           date,
         });
-        startTypewriter(res.data.choices[0].message.content, date);
-        scrollRef.value.scrollTo(conversation.value.length, "start-force");
+        // startTypewriter(, date);
+        setTimeout(() => {
+          scrollRef.value.scrollTo(
+            conversation.value.length - 1,
+            "start-force"
+          );
+        }, 400);
       } catch (e) {
         console.log(e);
+        $q.notify({
+          message: "Something went wrong. Please try again",
+          color: "negative",
+          position: "top-right",
+        });
       } finally {
         regenerateVal.value = prompt.value;
         prompt.value = "";
@@ -451,17 +469,29 @@ export default defineComponent({
       );
 
       try {
-        const res = await generatePromptResponse(regenerateVal.value);
+        const res = await generatePromptResponse(
+          `${regenerateVal.value} Please have the response in a simple html format.`
+        );
         let date = Date.now();
         conversation.value.push({
           role: "assistant",
-          content: "",
+          content: res.data.choices[0].message.content,
           date,
         });
-        startTypewriter(res.data.choices[0].message.content, date);
-        scrollRef.value.scrollTo(conversation.value.length, "start-force");
+        // startTypewriter(, date);
+        setTimeout(() => {
+          scrollRef.value.scrollTo(
+            conversation.value.length - 1,
+            "start-force"
+          );
+        }, 400);
       } catch (e) {
         console.log(e);
+        $q.notify({
+          message: "Something went wrong. Please try again",
+          color: "negative",
+          position: "top-right",
+        });
       } finally {
         loadingReg.value = false;
       }
@@ -512,23 +542,27 @@ export default defineComponent({
       let i = 0;
       let currentConvo = conversation.value.find((c) => c.date === d);
       setTimeout(() => {
+        let t;
         const type = () => {
           if (i < text.length) {
             // if (i % 100 === 0)
-            // scrollRef.value.scrollTo(conversation.value.length, "start-force");
+            //   scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
             currentConvo.content += text.charAt(i);
             i++;
-            setTimeout(type, 15);
+            t = setTimeout(type, 10);
           }
         };
 
         type();
+        if (i == text.length) clearTimeout(t);
       }, 450);
     }
 
     async function copyText(text) {
       try {
-        await copyToClipboard(text);
+        const removeHTMLTags = text.replace(/<\/?[^>]+>/gi, "");
+
+        await copyToClipboard(removeHTMLTags);
         $q.notify({
           message: "Text successfully copied!",
           color: "positive",

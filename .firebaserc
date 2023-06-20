@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "promptme-7b9d8"
-  }
+    "default": "promptme-7b9d8",
+    "production": "promptpal-4c3e8"
+  },
+  "targets": {},
+  "etags": {}
 }

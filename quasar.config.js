@@ -113,12 +113,12 @@ module.exports = configure(function (/* ctx */) {
       // directives: [],
 
       // Quasar plugins
-      plugins: ["Notify", "Loading", "LocalStorage"],
+      plugins: ["Notify", "Loading", "LocalStorage", "Dialog"],
     },
 
     // animations: 'all', // --- includes all animations
     // https://v2.quasar.dev/options/animations
-    animations: ["fadeInUp"],
+    animations: ["fadeInUp", "fadeOutDown", "fadeIn", "fadeOut", "fadeInDown"],
 
     // https://v2.quasar.dev/quasar-cli-vite/quasar-config-js#property-sourcefiles
     // sourceFiles: {

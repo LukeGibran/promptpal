@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { db, collection, getDocs, addDoc } from "../utils/firebaseProxy";
-import { Notify } from "quasar";
+import { Notify, Loading } from "quasar";
 
 export const useMenuStore = defineStore("menu", {
   state: () => ({
@@ -90,6 +90,7 @@ export const useMenuStore = defineStore("menu", {
 
     async getSubMenus() {
       this.gettingSubMenus = true;
+      Loading.show({ message: "Fetching some data, please wait.." });
       try {
         const ref = collection(db, "submenus");
         const snap = await getDocs(ref);
@@ -106,6 +107,7 @@ export const useMenuStore = defineStore("menu", {
         });
       } finally {
         this.gettingSubMenus = false;
+        Loading.hide();
       }
     },
   },

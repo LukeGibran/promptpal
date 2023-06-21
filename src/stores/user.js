@@ -1,17 +1,26 @@
 import { defineStore } from "pinia";
+import { LocalStorage } from "quasar";
 import {
+  db,
+  doc,
   auth,
-  signOut,
-  updateProfile,
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
   setDoc,
   getDoc,
-  doc,
-  db,
-  collection,
   addDoc,
+  signOut,
+  updateDoc,
+  collection,
+  updateEmail,
+  updateProfile,
+  updatePassword,
+  EmailAuthProvider,
+  signInWithEmailAndPassword,
+  reauthenticateWithCredential,
+  createUserWithEmailAndPassword,
 } from "../utils/firebaseProxy";
+
+import { Loading, Notify } from "quasar";
+
 export const useUserStore = defineStore("user", {
   state: () => ({
     user: {
@@ -20,6 +29,7 @@ export const useUserStore = defineStore("user", {
     },
     registering: false,
     loggingIn: false,
+    freeCredits: 0,
   }),
   actions: {
     async register({
@@ -97,6 +107,9 @@ export const useUserStore = defineStore("user", {
     },
 
     async getUserData(user) {
+      Loading.show({
+        message: "Getting user data..",
+      });
       try {
         const ref = doc(db, "users", user);
         const snap = await getDoc(ref);
@@ -110,6 +123,8 @@ export const useUserStore = defineStore("user", {
         }
       } catch (error) {
         console.log(error);
+      } finally {
+        Loading.hide();
       }
     },
 
@@ -118,6 +133,131 @@ export const useUserStore = defineStore("user", {
         this.user.loggedIn = user !== null;
       } else {
         this.user.data = null;
+      }
+    },
+
+    async updateBasicInfos({
+      firstName,
+      lastName,
+      occupation,
+      industryId,
+      email,
+    }) {
+      Loading.show({
+        message: "Updating your profile..",
+      });
+      try {
+        const ref = doc(db, "users", auth.currentUser.uid);
+        const data = {
+          email,
+          lastName,
+          firstName,
+          occupation,
+          industryId,
+          updatedAt: Date.now(),
+          displayName: `${firstName} ${lastName[0]}.`,
+        };
+
+        await updateDoc(ref, data);
+
+        await updateProfile(auth.currentUser, {
+          displayName: `${firstName} ${lastName[0]}.`,
+        });
+
+        this.user.data = {
+          ...this.user.data,
+          ...data,
+        };
+
+        Notify.create({
+          message: "Successfully updated your profile!",
+          color: "positive",
+          position: "top-right",
+        });
+      } catch (error) {
+        console.log(error);
+        Notify.create({
+          message: "Something went wrong, please try again.",
+          color: "negative",
+          position: "top-right",
+        });
+      } finally {
+        Loading.hide();
+      }
+    },
+
+    async updateEmail({ email, password }) {
+      Loading.show({
+        message: "Updating your Email..",
+      });
+      try {
+        const credential = EmailAuthProvider.credential(
+          auth.currentUser.email,
+          password
+        );
+        await reauthenticateWithCredential(auth.currentUser, credential);
+        await updateEmail(auth.currentUser, email);
+        Notify.create({
+          message: "Successfully updated your email!",
+          color: "positive",
+          position: "top-right",
+        });
+      } catch (error) {
+        console.log(error);
+        Notify.create({
+          message: "Wrong password given, please try again.",
+          color: "negative",
+          position: "top-right",
+        });
+        throw new Error();
+      } finally {
+        Loading.hide();
+      }
+    },
+
+    async updateUserPass({ newPass, password }) {
+      Loading.show({
+        message: "Updating your password..",
+      });
+      try {
+        const credential = EmailAuthProvider.credential(
+          auth.currentUser.email,
+          password
+        );
+        await reauthenticateWithCredential(auth.currentUser, credential);
+        await updatePassword(auth.currentUser, newPass);
+        Notify.create({
+          message: "Successfully updated your password!",
+          color: "positive",
+          position: "top-right",
+        });
+      } catch (error) {
+        console.log(error);
+        Notify.create({
+          message: "Wrong password given, please try again.",
+          color: "negative",
+          position: "top-right",
+        });
+        throw new Error();
+      } finally {
+        Loading.hide();
+      }
+    },
+    async updateCredits(credit) {
+      try {
+        const ref = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(ref, { credits: credit });
+
+        this.user.data.credits = credit;
+      } catch (error) {
+        console.log(errror);
+      }
+    },
+
+    updateFreeCredits(credit) {
+      this.freeCredits = credit;
+      if (LocalStorage.getItem("free_credits")) {
+        LocalStorage.set("free_credits", { credits: credit, date: Date.now() });
       }
     },
   },

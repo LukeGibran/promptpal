@@ -84,46 +84,62 @@
                       <div class="col-6"></div>
                     </div>
 
-                    <!-- <q-input
-                      outlined
-                      v-model="password"
-                      :rules="[rules.required, rules.password]"
-                      :type="isPwd ? 'password' : 'text'"
-                      label="Password"
-                      class="q-mb-md"
-                    >
-                      <template v-slot:append>
-                        <q-icon
-                          :name="isPwd ? 'visibility_off' : 'visibility'"
-                          class="cursor-pointer"
-                          @click="isPwd = !isPwd"
-                        />
-                      </template>
-                    </q-input>
-                    <q-input
-                      outlined
-                      v-model="password1"
-                      :rules="[
-                        rules.required,
-                        (val) => val === password || 'Passwords do not match!',
-                      ]"
-                      :type="isPwd1 ? 'password' : 'text'"
-                      label="Retype password"
-                      class="q-mb-md"
-                    >
-                      <template v-slot:append>
-                        <q-icon
-                          :name="isPwd1 ? 'visibility_off' : 'visibility'"
-                          class="cursor-pointer"
-                          @click="isPwd1 = !isPwd1"
-                        />
-                      </template>
-                    </q-input> -->
                     <q-btn
-                      :loading="registering"
                       label="Update Profile"
                       type="submit"
                       color="primary"
+                      @click="checkIfEmailIsUpdated()"
+                    />
+                  </q-form>
+                  <q-form>
+                    <div class="row q-mt-lg">
+                      <div class="col-6 q-px-sm">
+                        <q-input
+                          outlined
+                          ref="inputRef"
+                          v-model="password"
+                          :rules="[rules.password]"
+                          :type="isPwd ? 'password' : 'text'"
+                          label="New Password"
+                          class="q-mb-md"
+                        >
+                          <template v-slot:append>
+                            <q-icon
+                              :name="isPwd ? 'visibility_off' : 'visibility'"
+                              class="cursor-pointer"
+                              @click="isPwd = !isPwd"
+                            />
+                          </template>
+                        </q-input>
+                      </div>
+                      <div class="col-6">
+                        <q-input
+                          outlined
+                          v-model="password1"
+                          :rules="[
+                            (val) =>
+                              val === password || 'Passwords do not match!',
+                          ]"
+                          :type="isPwd1 ? 'password' : 'text'"
+                          label="Retype password"
+                          class="q-mb-md"
+                        >
+                          <template v-slot:append>
+                            <q-icon
+                              :name="isPwd1 ? 'visibility_off' : 'visibility'"
+                              class="cursor-pointer"
+                              @click="isPwd1 = !isPwd1"
+                            />
+                          </template>
+                        </q-input>
+                      </div>
+                    </div>
+                    <q-btn
+                      label="Update Password"
+                      type="submit"
+                      color="secondary"
+                      :disable="password !== password1 || !password"
+                      @click="updateUserPassword()"
                     />
                   </q-form>
                 </q-card-main>
@@ -149,9 +165,9 @@ export default defineComponent({
   setup() {
     const userStore = useUserStore();
 
-    const { register } = userStore;
+    const { updateBasicInfos, updateEmail, updateUserPass } = userStore;
 
-    const { registering, user } = storeToRefs(userStore);
+    const { user } = storeToRefs(userStore);
 
     const isPwd = ref(true);
     const email = ref("");
@@ -160,6 +176,8 @@ export default defineComponent({
     const password = ref("");
     const password1 = ref("");
     const firstName = ref("");
+    const inputRef = ref("");
+    const confirmPassword = ref("");
     const selectedOccupation = ref("");
     const selectedIndustry = ref(null);
     const occupations = ref([
@@ -328,32 +346,74 @@ export default defineComponent({
       selectedOccupation.value = user.occupation;
     }
 
-    const registerUser = async () => {
+    function checkIfEmailIsUpdated() {
+      if (user.value.data.email != email.value) askPassword();
+      else updateUserProfile();
+    }
+
+    function askPassword() {
+      $q.dialog({
+        title: "Confirm password",
+        message: "Please re-enter your password to update your email",
+        prompt: {
+          model: "",
+          type: "password",
+          isValid: rules.password,
+        },
+        cancel: true,
+        persistent: true,
+      }).onOk((data) => {
+        confirmPassword.value = data;
+        updateUserEmail();
+      });
+    }
+
+    const updateUserEmail = async () => {
       try {
-        await register({
+        await updateEmail({
           email: email.value,
-          password: password.value,
-          lastName: lastName.value,
-          firstName: firstName.value,
-          occupation: selectedOccupation.value,
+          password: confirmPassword.value,
         });
 
-        router.push("/");
-
-        $q.notify({
-          message: `Welcome ${firstName.value}!`,
-          color: "positive",
-          position: "top-right",
-        });
+        await updateUserProfile();
       } catch (error) {
         console.log(error);
-        $q.notify({
-          message: "Something went wrong. Please try again",
-          color: "negative",
-          position: "top-right",
-        });
       }
     };
+
+    const updateUserProfile = async () => {
+      await updateBasicInfos({
+        email: email.value,
+        lastName: lastName.value,
+        firstName: firstName.value,
+        occupation: selectedOccupation.value,
+        industryId: selectedIndustry.value.id,
+        confirmPassword,
+      });
+    };
+
+    function updateUserPassword() {
+      $q.dialog({
+        title: "Confirm password",
+        message: "Please re-enter your current password to set up a new one",
+        prompt: {
+          model: "",
+          type: "password",
+          isValid: rules.password,
+        },
+        cancel: true,
+        persistent: true,
+      }).onOk(async (data) => {
+        await updateUserPass({ newPass: password.value, password: data });
+
+        password.value = "";
+        password1.value = "";
+
+        setTimeout(() => {
+          inputRef.value.resetValidation();
+        }, 100);
+      });
+    }
 
     return {
       user,
@@ -363,19 +423,17 @@ export default defineComponent({
       isPwd1,
       lastName,
       password,
+      inputRef,
       password1,
       firstName,
-      registering,
+      askPassword,
       occupations,
-      registerUser,
       selectedIndustry,
+      updateUserProfile,
       selectedOccupation,
+      updateUserPassword,
+      checkIfEmailIsUpdated,
     };
-  },
-  watch: {
-    user(val) {
-      console.log(val);
-    },
   },
 });
 </script>

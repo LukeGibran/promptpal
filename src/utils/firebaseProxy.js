@@ -3,13 +3,18 @@ import { getFunctions, connectFunctionsEmulator } from "firebase/functions";
 import {
   signOut,
   getAuth,
+  updateEmail,
   updateProfile,
+  updatePassword,
+  EmailAuthProvider,
+  reauthenticateWithCredential,
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
 } from "firebase/auth";
 import {
   getFirestore,
   collection,
+  updateDoc,
   getDocs,
   getDoc,
   addDoc,
@@ -41,6 +46,10 @@ auth.onAuthStateChanged((user) => {
   else LocalStorage.remove("user");
 });
 
+if (!LocalStorage.getItem("free_credits")) {
+  LocalStorage.set("free_credits", { credits: 3, date: Date.now() });
+}
+
 export {
   db,
   doc,
@@ -50,10 +59,15 @@ export {
   getDoc,
   signOut,
   getDocs,
+  updateDoc,
   functions,
   collection,
+  updateEmail,
   firebaseApp,
   updateProfile,
-  createUserWithEmailAndPassword,
+  updatePassword,
+  EmailAuthProvider,
   signInWithEmailAndPassword,
+  reauthenticateWithCredential,
+  createUserWithEmailAndPassword,
 };

@@ -11,10 +11,13 @@
         </router-link>
         <div class="q-mx-lg"></div>
         <router-link to="/">
-          <q-btn class="text-info" flat label="Home" />
+          <q-btn class="text-info" flat label="Prompt" />
+        </router-link>
+        <router-link to="terms">
+          <q-btn class="text-primary" flat label="Terms & Service" />
         </router-link>
         <router-link to="">
-          <q-btn class="text-primary" flat label="Terms & Service" />
+          <q-btn class="text-info" flat label="Subscription" />
         </router-link>
         <q-toolbar-title class="text-dark"> </q-toolbar-title>
         <div
@@ -27,10 +30,14 @@
           v-if="user.data && user.loggedIn"
         >
           <i class="material-icons">generating_tokens</i> Credits:
-          {{ user?.data?.credits }}
+          {{ user?.data?.credits === -1 ? "Unlimited" : user?.data?.credits }}
         </div>
-        <div class="custom-border credit-border free">
-          <i class="material-icons">generating_tokens</i> Free Credits: 3
+        <div
+          class="custom-border credit-border free"
+          v-if="!user.data && !user.loggedIn"
+        >
+          <i class="material-icons">generating_tokens</i> Free Credits:
+          {{ freeCredits }}
         </div>
         <q-btn
           v-if="!user.loggedIn"
@@ -111,19 +118,30 @@
 </template>
 
 <script>
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import { auth } from "../utils/firebaseProxy";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "stores/user";
 import { useRouter } from "vue-router";
+import { useQuasar } from "quasar";
 
 export default defineComponent({
   name: "MainLayout",
   setup() {
     const userStore = useUserStore();
-    const { fetchUser, logOut, getUserData } = userStore;
-    const { user } = storeToRefs(userStore);
+    const { fetchUser, logOut, getUserData, updateFreeCredits } = userStore;
+    const { user, freeCredits } = storeToRefs(userStore);
     const router = useRouter();
+
+    const $q = useQuasar();
+
+    onMounted(() => {
+      if ($q.localStorage.getItem("free_credits")) {
+        const credits = $q.localStorage.getItem("free_credits");
+
+        updateFreeCredits(credits.credits);
+      }
+    });
 
     auth.onAuthStateChanged(async (user) => {
       if (user) {
@@ -141,6 +159,7 @@ export default defineComponent({
     return {
       user,
       signOut,
+      freeCredits,
     };
   },
 });

@@ -39,7 +39,7 @@ const firebaseApp = initializeApp(firebaseConfig);
 const functions = getFunctions(firebaseApp);
 const db = getFirestore(firebaseApp);
 const auth = getAuth(firebaseApp);
-// connectFunctionsEmulator(functions, "localhost", 5001);
+connectFunctionsEmulator(functions, "localhost", 5001);
 
 auth.onAuthStateChanged((user) => {
   if (user) LocalStorage.set("user", user);

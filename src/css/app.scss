@@ -1,4 +1,7 @@
 // app global css in SCSS form
+body {
+  overflow: hidden;
+}
 @font-face {
   font-family: LeagueSpartan;
   src: url(./fonts/LeagueSpartan.ttf);
@@ -69,7 +72,7 @@
   h4,
   h5,
   h6 {
-    font-size: 18px;
+    font-size: 18px !important;
     font-weight: 600;
   }
 }

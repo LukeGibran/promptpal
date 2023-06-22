@@ -66,6 +66,7 @@
                 color="primary"
                 icon="refresh"
                 size="sm"
+                v-if="hasCredits"
                 :loading="loadingReg"
                 @click="regeneratePrompt()"
               >
@@ -165,229 +166,267 @@
             v-if="selectedPrompt.title && hasCredits"
             style="border: 1px solid #ccc"
           >
-            <q-card-section>
-              <q-card-main v-if="hasCredits">
-                <div
-                  v-if="
-                    selectedPrompt.title && selectedPrompt.inputs.length === 1
-                  "
-                >
-                  <q-input
-                    class="q-mb-sm"
-                    v-model="input1"
-                    :placeholder="_startCase(selectedPrompt.inputs[0].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
-                        : ''
+            <q-card-section class="q-pa-none">
+              <q-scroll-area
+                style="min-height: 150px; max-height: 400px"
+                :style="setHeight(selectedPrompt.inputs.length)"
+                :thumb-style="thumbStyle"
+                :bar-style="barStyle"
+                class="q-pa-md"
+              >
+                <q-card-main v-if="hasCredits">
+                  <div
+                    v-if="
+                      selectedPrompt.title && selectedPrompt.inputs.length === 1
                     "
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                </div>
-                <div
-                  v-if="
-                    selectedPrompt.title && selectedPrompt.inputs.length === 2
-                  "
-                >
-                  <q-input
-                    class="q-mb-sm"
-                    v-model="input1"
-                    :placeholder="_startCase(selectedPrompt.inputs[0].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
-                        : ''
+                  >
+                    <q-input
+                      class="q-mb-sm"
+                      v-model="input1"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[0].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          : ''
+                      "
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                  </div>
+                  <div
+                    v-if="
+                      selectedPrompt.title && selectedPrompt.inputs.length === 2
                     "
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    v-model="input2"
-                    :placeholder="_startCase(selectedPrompt.inputs[1].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
-                        : ''
+                  >
+                    <q-input
+                      class="q-mb-sm"
+                      v-model="input1"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[0].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          : ''
+                      "
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      v-model="input2"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[1].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
+                          : ''
+                      "
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                  </div>
+                  <div
+                    v-if="
+                      selectedPrompt.title && selectedPrompt.inputs.length === 3
                     "
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                </div>
-                <div
-                  v-if="
-                    selectedPrompt.title && selectedPrompt.inputs.length === 3
-                  "
-                >
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[0].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
-                        : ''
+                  >
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[0].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          : ''
+                      "
+                      v-model="input1"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[1].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
+                          : ''
+                      "
+                      v-model="input2"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[2].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[2].hint)}`
+                          : ''
+                      "
+                      v-model="input3"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                  </div>
+                  <div
+                    v-if="
+                      selectedPrompt.title && selectedPrompt.inputs.length === 4
                     "
-                    v-model="input1"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[1].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
-                        : ''
+                  >
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[0].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          : ''
+                      "
+                      v-model="input1"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[1].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
+                          : ''
+                      "
+                      v-model="input2"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[2].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[2].hint)}`
+                          : ''
+                      "
+                      v-model="input3"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[3].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[3].hint)}`
+                          : ''
+                      "
+                      v-model="input4"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                  </div>
+                  <div
+                    v-if="
+                      selectedPrompt.title && selectedPrompt.inputs.length === 5
                     "
-                    v-model="input2"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[2].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[2].hint)}`
-                        : ''
-                    "
-                    v-model="input3"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                </div>
-                <div
-                  v-if="
-                    selectedPrompt.title && selectedPrompt.inputs.length === 4
-                  "
-                >
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[0].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
-                        : ''
-                    "
-                    v-model="input1"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[1].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
-                        : ''
-                    "
-                    v-model="input2"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[2].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[2].hint)}`
-                        : ''
-                    "
-                    v-model="input3"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[3].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[3].hint)}`
-                        : ''
-                    "
-                    v-model="input4"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                </div>
-                <div
-                  v-if="
-                    selectedPrompt.title && selectedPrompt.inputs.length === 5
-                  "
-                >
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[0].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
-                        : ''
-                    "
-                    v-model="input1"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[1].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
-                        : ''
-                    "
-                    v-model="input2"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[2].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[2].hint)}`
-                        : ''
-                    "
-                    v-model="input3"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[3].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[3].hint)}`
-                        : ''
-                    "
-                    v-model="input4"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                  <q-input
-                    class="q-mb-sm"
-                    :placeholder="_startCase(selectedPrompt.inputs[4].keyword)"
-                    :hint="
-                      selectedPrompt.inputs[0].hint
-                        ? `e.g. ${_startCase(selectedPrompt.inputs[4].hint)}`
-                        : ''
-                    "
-                    v-model="input5"
-                    outlined
-                    :disable="!selectedPrompt.title"
-                  ></q-input>
-                </div>
+                  >
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[0].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          : ''
+                      "
+                      v-model="input1"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[1].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
+                          : ''
+                      "
+                      v-model="input2"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[2].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[2].hint)}`
+                          : ''
+                      "
+                      v-model="input3"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[3].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[3].hint)}`
+                          : ''
+                      "
+                      v-model="input4"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                    <q-input
+                      class="q-mb-sm"
+                      :placeholder="
+                        _startCase(selectedPrompt.inputs[4].keyword)
+                      "
+                      :hint="
+                        selectedPrompt.inputs[0].hint
+                          ? `e.g. ${_startCase(selectedPrompt.inputs[4].hint)}`
+                          : ''
+                      "
+                      v-model="input5"
+                      outlined
+                      :disable="!selectedPrompt.title"
+                    ></q-input>
+                  </div>
 
-                <div class="row justify-end">
-                  <q-btn
-                    :disable="!selectedPrompt.title || loadingReg"
-                    label="Generate"
-                    color="secondary"
-                    :loading="loading"
-                    @click="submitPrompt"
-                  />
-                </div>
-              </q-card-main>
+                  <div class="row justify-end">
+                    <q-btn
+                      :disable="!selectedPrompt.title || loadingReg"
+                      label="Generate"
+                      color="secondary"
+                      :loading="loading"
+                      @click="submitPrompt"
+                    />
+                  </div>
+                </q-card-main>
+              </q-scroll-area>
             </q-card-section>
           </q-card>
         </transition>
@@ -454,6 +493,12 @@ export default defineComponent({
       return !!freeCredits.value;
     });
 
+    function setHeight(inputsLength) {
+      if (inputsLength == 1) return { height: "155px " };
+      else if (inputsLength == 2) return { height: "250px " };
+      else return { height: "330px" };
+    }
+
     async function submitPrompt() {
       if (!input1.value) return;
 
@@ -466,13 +511,11 @@ export default defineComponent({
       );
 
       try {
-        const res = await generatePromptResponse(
-          `${prompt.value}. Please have the response in a simple html format.`
-        );
+        const res = await generatePromptResponse(`${prompt.value}`);
         let date = Date.now();
         conversation.value.push({
           role: "assistant",
-          content: res.data.choices[0].message.content,
+          content: res.data,
           date,
         });
         // startTypewriter(, date);
@@ -503,13 +546,11 @@ export default defineComponent({
       );
 
       try {
-        const res = await generatePromptResponse(
-          `${regenerateVal.value} Please have the response in a simple html format.`
-        );
+        const res = await generatePromptResponse(`${regenerateVal.value}`);
         let date = Date.now();
         conversation.value.push({
           role: "assistant",
-          content: res.data.choices[0].message.content,
+          content: res.data,
           date,
         });
         // startTypewriter(, date);
@@ -636,6 +677,7 @@ export default defineComponent({
       copyText,
       scrollRef,
       setPrompt,
+      setHeight,
       hasCredits,
       loadingReg,
       _startCase,
@@ -648,6 +690,22 @@ export default defineComponent({
       gettingSubMenus,
       selectedSubMenu,
       regeneratePrompt,
+
+      thumbStyle: {
+        right: "4px",
+        borderRadius: "7px",
+        backgroundColor: "#e7e5b7",
+        width: "4px",
+        opacity: 0.75,
+      },
+
+      barStyle: {
+        right: "2px",
+        borderRadius: "9px",
+        backgroundColor: "transparent",
+        width: "8px",
+        opacity: 0.2,
+      },
     };
   },
 });

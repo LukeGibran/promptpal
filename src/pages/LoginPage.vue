@@ -39,13 +39,21 @@
                     <q-btn-group spread>
                       <q-btn
                         :loading="loggingIn"
-                        @click="loginUser()"
+                        @click.prevent="loginUser()"
                         label="Login"
                         type="submit"
                         color="primary"
                       />
                     </q-btn-group>
                   </q-form>
+                  <div class="q-mt-md text-center">
+                    <div>
+                      Not yet a member?
+                      <router-link style="color: #00b4d8" to="register">
+                        Register here
+                      </router-link>
+                    </div>
+                  </div>
                 </q-card-main>
               </q-card-section>
               <q-separator />

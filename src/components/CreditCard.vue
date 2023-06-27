@@ -1,0 +1,370 @@
+<template>
+  <div class="card">
+    <div class="card-inner">
+      <div class="card-front">
+        <div class="card-bg"></div>
+        <div class="card-glow"></div>
+
+        <div class="card-brand">{{ data?.brand }}</div>
+
+        <div class="card-contactless">
+          <svg xmlns="http://www.w3.org/2000/svg" width="46" height="56">
+            <path
+              fill="none"
+              stroke="#f9f9f9"
+              stroke-width="6"
+              stroke-linecap="round"
+              d="m35,3a50,50 0 0,1 0,50M24,8.5a39,39 0 0,1 0,39M13.5,13.55a28.2,28.5
+  0 0,1 0,28.5M3,19a18,17 0 0,1 0,18"
+            />
+          </svg>
+        </div>
+        <div class="card-chip"></div>
+        <div class="card-holder">{{ name }}</div>
+        <div class="card-number">*** *** *** {{ data?.last4 }}</div>
+        <div class="card-valid">
+          {{ `${data?.exp_month}/${("" + data?.exp_year).slice(-2)}` }}
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import { ref } from "vue";
+
+export default {
+  props: {
+    data: {
+      type: Object,
+      required: true,
+    },
+    name: {
+      type: String,
+      required: true,
+    },
+  },
+  setup() {
+    const cardNumber = ref("1234 5678 9012 3456");
+    const cardHolderName = ref("John Doe");
+    const cardExpiry = ref("12/24");
+    const cvv = ref("123");
+
+    return {
+      cardNumber,
+      cardHolderName,
+      cardExpiry,
+      cvv,
+    };
+  },
+};
+</script>
+
+<style scoped lang="scss">
+body {
+  font-family: "Overpass Mono", monospace;
+  font-weight: 400;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  margin: 0;
+  background-image: linear-gradient(
+    to right top,
+    #d16ba5,
+    #c777b9,
+    #ba83ca,
+    #aa8fd8,
+    #9a9ae1,
+    #8aa7ec,
+    #79b3f4,
+    #69bff8,
+    #52cffe,
+    #41dfff,
+    #46eefa,
+    #5ffbf1
+  );
+}
+
+.card {
+  width: 320px;
+  height: 200px;
+  border-radius: 10px;
+  perspective: 1000px;
+
+  &-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    transition: transform 600ms ease;
+    transform-style: preserve-3d;
+    box-shadow: 0 0 25px 2px rgba(black, 0.2);
+  }
+
+  &-front,
+  &-back {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 10px;
+    overflow: hidden;
+    backface-visibility: hidden;
+    background: linear-gradient(321.03deg, #01adef 0%, #0860bf 91.45%);
+  }
+
+  &-front {
+    border-radius: 10px;
+    overflow: hidden;
+    position: relative;
+    transition: transform 300ms ease-in-out;
+  }
+
+  &-back {
+    transform: rotateY(180deg);
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: 40%;
+      left: 20%;
+      width: 180%;
+      height: 120%;
+      border-radius: 100%;
+      background-image: linear-gradient(
+        to right top,
+        #a3d4e7,
+        #a7d5e6,
+        #abd5e4,
+        #aed6e3,
+        #b2d6e2,
+        #aed4e2,
+        #abd3e1,
+        #a7d1e1,
+        #9bcee1,
+        #8ecae1,
+        #81c7e1,
+        #73c3e1
+      );
+      filter: blur(10px);
+      opacity: 0.15;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 15%;
+      width: 100%;
+      height: 40px;
+      background-image: linear-gradient(
+        to right top,
+        #021318,
+        #07191f,
+        #0a1f26,
+        #0b262e,
+        #0c2c35,
+        #0c2c35,
+        #0c2c35,
+        #0c2c35,
+        #0b262e,
+        #0a1f26,
+        #07191f,
+        #021318
+      );
+    }
+  }
+
+  &-bg {
+    position: absolute;
+    top: -20px;
+    right: -120px;
+    width: 380px;
+    height: 250px;
+    background: linear-gradient(321.03deg, #01adef 0%, #0860bf 91.45%);
+    border-top-left-radius: 100%;
+
+    &::before {
+      content: "";
+      position: absolute;
+      top: -20px;
+      right: -80px;
+      width: 380px;
+      height: 250px;
+      background: linear-gradient(321.03deg, #01adef 0%, #0860bf 91.45%);
+      border-top-left-radius: 100%;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: -20px;
+      right: -120px;
+      width: 380px;
+      height: 250px;
+      background: linear-gradient(321.03deg, #01adef 0%, #0860bf 91.45%);
+      border-top-left-radius: 100%;
+    }
+  }
+
+  &-glow {
+    position: absolute;
+    top: -140px;
+    left: -65px;
+    height: 200px;
+    width: 400px;
+    background: rgba(#00b7ff, 0.4);
+    filter: blur(10px);
+    border-radius: 100%;
+    transform: skew(-15deg, -15deg);
+  }
+
+  &-contactless {
+    position: absolute;
+    right: 15px;
+    top: 55px;
+    transform: scale(0.5);
+  }
+
+  &-chip {
+    position: absolute;
+    top: 65px;
+    left: 25px;
+    width: 45px;
+    height: 34px;
+    border-radius: 5px;
+    background-color: #ffda7b;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: 49%;
+      top: -7%;
+      transform: translateX(-50%);
+      background: #ffda7b;
+      border: 1px solid #a27c1f;
+      width: 25%;
+      height: 110%;
+      border-radius: 100%;
+      z-index: 2;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      top: 30%;
+      left: -10%;
+      background: transparent;
+      border: 1px solid #a27c1f;
+      width: 120%;
+      height: 33%;
+    }
+  }
+
+  &-holder {
+    position: absolute;
+    left: 25px;
+    bottom: 30px;
+    color: white;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    filter: drop-shadow(1px 1px 1px rgba(black, 0.3));
+  }
+
+  &-number {
+    position: absolute;
+    left: 25px;
+    bottom: 65px;
+    color: white;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.2em;
+    filter: drop-shadow(1px 1px 1px rgba(black, 0.3));
+  }
+
+  &-valid {
+    position: absolute;
+    right: 25px;
+    bottom: 30px;
+    color: white;
+    font-size: 14px;
+    letter-spacing: 0.2em;
+    filter: drop-shadow(1px 1px 1px rgba(black, 0.3));
+
+    &::before {
+      content: "GOOD THRU";
+      position: absolute;
+      top: 1px;
+      left: -35px;
+      width: 50px;
+      font-size: 7px;
+    }
+  }
+
+  &-signature {
+    position: absolute;
+    top: 120px;
+    left: 15px;
+    width: 70%;
+    height: 30px;
+    background: rgb(238, 236, 236);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #021318;
+    font-family: "Mr Dafoe", cursive;
+    font-size: 38px;
+    font-weight: 400;
+
+    &::before {
+      content: "Authorized Signature";
+      position: absolute;
+      top: -15px;
+      left: 0;
+      font-family: "Overpass Mono", monospace;
+      font-size: 9px;
+      color: rgb(238, 236, 236);
+    }
+  }
+
+  &-seccode {
+    position: absolute;
+    top: 125px;
+    left: 245px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 17px;
+    color: #021318;
+    background-color: rgb(238, 236, 236);
+    text-align: center;
+    font-size: 11px;
+  }
+}
+
+.logo {
+  position: absolute;
+  right: 25px;
+  top: 30px;
+}
+
+.card-brand {
+  position: absolute;
+  right: 25px;
+  top: 20px;
+  font-size: 2rem;
+  color: #fff;
+  text-transform: uppercase;
+}
+
+.hint {
+  padding: 2em 0;
+  font-family: "Noto Sans KR", sans-serif;
+  letter-spacing: 0.025em;
+  font-weight: 400;
+  color: #a3d4e7;
+}
+</style>

@@ -78,7 +78,6 @@ body {
 }
 
 #dropdown-menu .q-icon.on-left {
-  background-color: #ef933a;
   border-radius: 2px;
   font-size: 1.25rem;
   color: #fff;
@@ -90,23 +89,54 @@ body {
 
 .credit-border {
   border-radius: 4px;
+  font-size: 0.85rem;
+  vertical-align: middle;
 
-  padding: 0 10px;
+  padding: 2px 10px;
   margin: 0 5px;
   color: #fff !important;
 
   &.active {
-    background-color: #4caf50;
-    border-color: #4caf50;
+    text-shadow: 1px 1px 1px rgba(#ef933a, 1);
+    background: rgb(239, 192, 58);
+    background: linear-gradient(
+      0deg,
+      rgba(239, 192, 58, 1) 14%,
+      rgba(245, 186, 81, 1) 59%,
+      rgba(239, 147, 58, 1) 100%
+    );
+    border-color: #ddd;
   }
 
   &.inactive {
-    background-color: #f44336;
-    border-color: #f44336;
+    background: rgb(247, 112, 102);
+    background: linear-gradient(
+      0deg,
+      rgba(247, 112, 102, 1) 0%,
+      rgba(244, 67, 54, 1) 74%
+    );
+    border: none;
   }
 
   &.free {
     background-color: darken(#f2c037, 8);
     border-color: darken(#f2c037, 8);
   }
+
+  &.large-font {
+    font-size: 1rem;
+    padding-top: 5px;
+    padding-bottom: 5px;
+  }
+}
+
+#card-table .q-table__top,
+#invoice-table .q-table__top {
+  background-color: #398492;
+  color: #fff;
+}
+
+#subscription-table .q-table__top {
+  background-color: #ef933a;
+  color: #fff;
 }

@@ -1,5 +1,4 @@
 import { defineStore } from "pinia";
-import { LocalStorage } from "quasar";
 import {
   db,
   doc,
@@ -29,7 +28,6 @@ export const useUserStore = defineStore("user", {
     },
     registering: false,
     loggingIn: false,
-    freeCredits: 0,
   }),
   actions: {
     async register({
@@ -107,9 +105,6 @@ export const useUserStore = defineStore("user", {
     },
 
     async getUserData(user) {
-      Loading.show({
-        message: "Getting user data..",
-      });
       try {
         const ref = doc(db, "users", user);
         const snap = await getDoc(ref);
@@ -123,8 +118,6 @@ export const useUserStore = defineStore("user", {
         }
       } catch (error) {
         console.log(error);
-      } finally {
-        Loading.hide();
       }
     },
 
@@ -243,22 +236,22 @@ export const useUserStore = defineStore("user", {
         Loading.hide();
       }
     },
-    async updateCredits(credit) {
-      try {
-        const ref = doc(db, "users", auth.currentUser.uid);
-        await updateDoc(ref, { credits: credit });
+    // async updateCredits(credit) {
+    //   try {
+    //     const ref = doc(db, "users", auth.currentUser.uid);
+    //     await updateDoc(ref, { credits: credit });
 
-        this.user.data.credits = credit;
-      } catch (error) {
-        console.log(errror);
-      }
-    },
+    //     this.user.data.credits = credit;
+    //   } catch (error) {
+    //     console.log(errror);
+    //   }
+    // },
 
-    updateFreeCredits(credit) {
-      this.freeCredits = credit;
-      if (LocalStorage.getItem("free_credits")) {
-        LocalStorage.set("free_credits", { credits: credit, date: Date.now() });
-      }
-    },
+    // updateFreeCredits(credit) {
+    //   this.freeCredits = credit;
+    //   if (LocalStorage.getItem("free_credits")) {
+    //     LocalStorage.set("free_credits", { credits: credit, date: Date.now() });
+    //   }
+    // },
   },
 });

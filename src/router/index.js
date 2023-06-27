@@ -35,7 +35,8 @@ export default route(function (/* { store, ssrContext } */) {
   });
 
   Router.beforeEach((to, from, next) => {
-    if (to.fullPath == "/" || to.fullPath == "/terms") return next();
+    const neutralPaths = ["/terms", "/subscription"];
+    if (neutralPaths.includes(to.path)) return next();
 
     if (to.meta.requiresAuth && !LocalStorage.has("user")) {
       return next("/login");

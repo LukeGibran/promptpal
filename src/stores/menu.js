@@ -90,7 +90,7 @@ export const useMenuStore = defineStore("menu", {
 
     async getSubMenus() {
       this.gettingSubMenus = true;
-      Loading.show({ message: "Fetching some data, please wait.." });
+      Loading.show({ message: "Fetching menus..." });
       try {
         const ref = collection(db, "submenus");
         const snap = await getDocs(ref);

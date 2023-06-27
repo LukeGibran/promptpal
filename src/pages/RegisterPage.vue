@@ -94,7 +94,7 @@
                         label="Register"
                         type="submit"
                         color="primary"
-                        @click="registerUser()"
+                        @click.prevent="registerUser()"
                       />
                     </q-btn-group>
                   </q-form>

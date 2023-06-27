@@ -13,14 +13,18 @@ import {
 } from "firebase/auth";
 import {
   getFirestore,
+  onSnapshot,
   collection,
   updateDoc,
+  orderBy,
   getDocs,
   getDoc,
   addDoc,
+  query,
+  where,
   setDoc,
   doc,
-} from "firebase/firestore/lite";
+} from "firebase/firestore";
 
 import { LocalStorage } from "quasar";
 
@@ -46,21 +50,25 @@ auth.onAuthStateChanged((user) => {
   else LocalStorage.remove("user");
 });
 
-if (!LocalStorage.getItem("free_credits")) {
-  LocalStorage.set("free_credits", { credits: 3, date: Date.now() });
-}
+// if (!LocalStorage.getItem("free_credits")) {
+//   LocalStorage.set("free_credits", { credits: 3, date: Date.now() });
+// }
 
 export {
   db,
   doc,
   auth,
+  where,
+  query,
   addDoc,
   setDoc,
   getDoc,
   signOut,
+  orderBy,
   getDocs,
   updateDoc,
   functions,
+  onSnapshot,
   collection,
   updateEmail,
   firebaseApp,

@@ -3,6 +3,7 @@ import LoginPage from "src/pages/LoginPage.vue";
 import RegisterPage from "src/pages/RegisterPage.vue";
 import ProfilePage from "src/pages/Profile.vue";
 import TermsService from "src/pages/TermsService.vue";
+import SubscriptionPage from "src/pages/Subscription.vue";
 
 const routes = [
   {
@@ -12,7 +13,7 @@ const routes = [
       {
         path: "",
         component: () => import("pages/IndexPage.vue"),
-        meta: { requiresAuth: false },
+        meta: { requiresAuth: true },
       },
       {
         path: "/add",
@@ -37,6 +38,16 @@ const routes = [
       {
         path: "/terms",
         component: TermsService,
+        meta: { requiresAuth: false },
+      },
+      {
+        path: "/subscription",
+        component: SubscriptionPage,
+        meta: { requiresAuth: false },
+      },
+      {
+        path: "/subscription?sub=success",
+        component: SubscriptionPage,
         meta: { requiresAuth: false },
       },
     ],

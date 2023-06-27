@@ -167,9 +167,11 @@
 </template>
 
 <script>
-import { ref, defineComponent, onMounted } from "vue";
+import { ref, defineComponent, onMounted, onBeforeUnmount } from "vue";
 import { useMenuStore } from "stores/menu";
 import { storeToRefs } from "pinia";
+import { document } from "postcss";
+import { dom } from "quasar";
 
 export default defineComponent({
   name: "AddPrompt",
@@ -198,7 +200,12 @@ export default defineComponent({
     const numberOfInput = ref(null);
 
     onMounted(() => {
+      window.document.body.style.overflow = "auto";
       !menus.value.length && getMenus();
+    });
+
+    onBeforeUnmount(() => {
+      window.document.body.style.overflow = "hidden";
     });
 
     async function submitSubMenu() {

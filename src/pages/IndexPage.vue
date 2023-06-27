@@ -66,7 +66,7 @@
                 color="primary"
                 icon="refresh"
                 size="sm"
-                v-if="hasCredits"
+                v-if="active"
                 :loading="loadingReg"
                 @click="regeneratePrompt()"
               >
@@ -121,7 +121,7 @@
         >
           <q-card
             class="no-shadow q-mb-md"
-            v-if="selectedPrompt.title && !hasCredits"
+            v-if="selectedPrompt.title && !active"
             style="border: 1px solid #ccc"
           >
             <q-card-section>
@@ -132,24 +132,10 @@
                   rounded
                   class="bg-red text-white"
                 >
-                  You've used up all your credits! You can buy more at our
-                  subscription page
+                  You have no credits, you can select a new plan at our
+                  subscrition page
                   <template v-slot:action>
-                    <q-btn flat label="Go to Subscription" to="" />
-                  </template>
-                </q-banner>
-
-                <q-banner
-                  v-else
-                  inline-actions
-                  rounded
-                  class="bg-red text-white"
-                >
-                  Oh no! You've used up your free credits! You can have 3 more
-                  if you signup or login to your account!
-                  <template v-slot:action>
-                    <q-btn flat label="Login" to="login" />
-                    <q-btn flat label="Signup" to="register" />
+                    <q-btn flat label="Go to Subscription" to="subscription" />
                   </template>
                 </q-banner>
               </q-card-main>
@@ -163,7 +149,7 @@
         >
           <q-card
             class="no-shadow q-mb-md"
-            v-if="selectedPrompt.title && hasCredits"
+            v-if="selectedPrompt.title && active"
             style="border: 1px solid #ccc"
           >
             <q-card-section class="q-pa-none">
@@ -174,7 +160,7 @@
                 :bar-style="barStyle"
                 class="q-pa-md"
               >
-                <q-card-main v-if="hasCredits">
+                <q-card-main v-if="active">
                   <div
                     v-if="
                       selectedPrompt.title && selectedPrompt.inputs.length === 1
@@ -188,7 +174,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[0].hint}`
                           : ''
                       "
                       outlined
@@ -208,7 +194,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[0].hint}`
                           : ''
                       "
                       outlined
@@ -222,7 +208,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[1].hint}`
                           : ''
                       "
                       outlined
@@ -241,7 +227,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[0].hint}`
                           : ''
                       "
                       v-model="input1"
@@ -255,7 +241,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[1].hint}`
                           : ''
                       "
                       v-model="input2"
@@ -269,7 +255,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[2].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[2].hint}`
                           : ''
                       "
                       v-model="input3"
@@ -289,7 +275,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[0].hint}`
                           : ''
                       "
                       v-model="input1"
@@ -303,7 +289,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[1].hint}`
                           : ''
                       "
                       v-model="input2"
@@ -317,7 +303,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[2].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[2].hint}`
                           : ''
                       "
                       v-model="input3"
@@ -331,7 +317,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[3].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[3].hint}`
                           : ''
                       "
                       v-model="input4"
@@ -351,7 +337,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[0].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[0].hint}`
                           : ''
                       "
                       v-model="input1"
@@ -365,7 +351,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[1].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[1].hint}`
                           : ''
                       "
                       v-model="input2"
@@ -379,7 +365,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[2].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[2].hint}`
                           : ''
                       "
                       v-model="input3"
@@ -393,7 +379,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[3].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[3].hint}`
                           : ''
                       "
                       v-model="input4"
@@ -407,7 +393,7 @@
                       "
                       :hint="
                         selectedPrompt.inputs[0].hint
-                          ? `e.g. ${_startCase(selectedPrompt.inputs[4].hint)}`
+                          ? `e.g. ${selectedPrompt.inputs[4].hint}`
                           : ''
                       "
                       v-model="input5"
@@ -442,6 +428,7 @@ import { functions } from "src/utils/firebaseProxy";
 import { httpsCallable } from "firebase/functions";
 import { useMenuStore } from "stores/menu";
 import { useUserStore } from "stores/user";
+import { useSubStore } from "stores/subscription";
 import { storeToRefs } from "pinia";
 import _startCase from "lodash/startCase";
 import _sortBy from "lodash/sortBy";
@@ -456,8 +443,10 @@ export default defineComponent({
     const { getMenus, getSubMenus, gettingSubMenus } = menuStore;
 
     const userStore = useUserStore();
-    const { user, freeCredits } = storeToRefs(userStore);
-    const { updateFreeCredits, updateCredits } = userStore;
+    const { user } = storeToRefs(userStore);
+
+    const subStore = useSubStore();
+    const { active } = storeToRefs(subStore);
 
     const prompt = ref("");
     const input1 = ref("");
@@ -485,13 +474,13 @@ export default defineComponent({
       }
     });
 
-    const hasCredits = computed(() => {
-      if (user.value.data && user.value.loggedIn) {
-        return !!user.value.data.credits;
-      }
+    // const hasCredits = computed(() => {
+    //   if (user.value.data && user.value.loggedIn) {
+    //     return !!user.value.data.credits;
+    //   }
 
-      return !!freeCredits.value;
-    });
+    //   return !!freeCredits.value;
+    // });
 
     function setHeight(inputsLength) {
       if (inputsLength == 1) return { height: "155px " };
@@ -522,8 +511,6 @@ export default defineComponent({
         setTimeout(() => {
           scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
         }, 400);
-
-        checkCredit();
       } catch (e) {
         console.log(e);
         $q.notify({
@@ -557,8 +544,6 @@ export default defineComponent({
         setTimeout(() => {
           scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
         }, 400);
-
-        checkCredit();
       } catch (e) {
         console.log(e);
         $q.notify({
@@ -651,15 +636,15 @@ export default defineComponent({
       }
     }
 
-    async function checkCredit() {
-      if (user.value.data && user.value.loggedIn) {
-        if (user.value.data.credits === -1) return;
+    // async function checkCredit() {
+    //   if (user.value.data && user.value.loggedIn) {
+    //     if (user.value.data.credits === -1) return;
 
-        if (user.value.data.credits) updateCredits(user.value.data.credits - 1);
-      } else {
-        if (freeCredits.value) updateFreeCredits(freeCredits.value - 1);
-      }
-    }
+    //     if (user.value.data.credits) updateCredits(user.value.data.credits - 1);
+    //   } else {
+    //     if (freeCredits.value) updateFreeCredits(freeCredits.value - 1);
+    //   }
+    // }
 
     return {
       user,
@@ -670,6 +655,7 @@ export default defineComponent({
       input3,
       input4,
       input5,
+      active,
       _sortBy,
       loading,
       setMenu,
@@ -678,7 +664,6 @@ export default defineComponent({
       scrollRef,
       setPrompt,
       setHeight,
-      hasCredits,
       loadingReg,
       _startCase,
       selectedMenu,

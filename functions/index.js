@@ -8,6 +8,9 @@ const configuration = new Configuration({
 
 const openai = new OpenAIApi(configuration);
 
+const { Stripe } = require("stripe");
+const stripe = new Stripe(process.env.STRIPE_API_KEY);
+
 function convertToHtml(plainTextResponse) {
   return marked.parse(plainTextResponse);
 }
@@ -35,4 +38,30 @@ exports.generatePromptResponse = functions.https.onCall(function (
         "Failed to generate prompt response."
       );
     });
+});
+
+exports.listAllCards = functions.https.onCall(async (data, context) => {
+  const paymentMethods = await stripe.paymentMethods.list({
+    customer: data.customer,
+    type: "card",
+  });
+
+  return paymentMethods;
+});
+
+exports.cancelSubscription = functions.https.onCall(async (data, context) => {
+  const deleted = await stripe.subscriptions.del(data.text).catch((error) => {
+    console.log(error);
+  });
+
+  return deleted;
+});
+
+exports.customerPortal = functions.https.onCall(async (data, context) => {
+  const session = await stripe.billingPortal.sessions.create({
+    customer: data.customer,
+    return_url: data.url,
+  });
+
+  return session;
 });

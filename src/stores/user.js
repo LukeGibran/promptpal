@@ -33,6 +33,10 @@ export const useUserStore = defineStore("user", {
   getters: {
     affiliateLink: (state) =>
       `${window.location.origin}/#/register?ref=${state.user.id}`,
+    hasCredits: (state) => {
+      if (state.user && state.user?.data?.credits)
+        return !!state.user.data.credits;
+    },
   },
   actions: {
     async register({
@@ -52,37 +56,36 @@ export const useUserStore = defineStore("user", {
         lastName,
         firstName,
         occupation,
+        credits: 3,
         industryId,
         role: "user",
         updatedAt: Date.now(),
         displayName: `${firstName} ${lastName[0]}.`,
       };
 
-      const response = await createUserWithEmailAndPassword(
-        auth,
-        email,
-        password
-      );
+      try {
+        const response = await createUserWithEmailAndPassword(
+          auth,
+          email,
+          password
+        );
 
-      if (response) {
-        updateProfile(auth.currentUser, {
-          displayName: `${firstName} ${lastName[0]}.`,
-        });
+        if (response) {
+          updateProfile(auth.currentUser, {
+            displayName: `${firstName} ${lastName[0]}.`,
+          });
 
-        try {
           await setDoc(doc(db, "users", response.user.uid), data);
           this.user.data = {
             ...data,
           };
-        } catch (error) {
-          console.log(error);
-          throw new Error("Unable to register user");
-        } finally {
-          this.registering = false;
+        } else {
+          throw new Error("Unable to login");
         }
-      } else {
+      } catch (error) {
+        throw new Error(error);
+      } finally {
         this.registering = false;
-        throw new Error("Unable to register user");
       }
     },
 
@@ -243,16 +246,16 @@ export const useUserStore = defineStore("user", {
         Loading.hide();
       }
     },
-    // async updateCredits(credit) {
-    //   try {
-    //     const ref = doc(db, "users", auth.currentUser.uid);
-    //     await updateDoc(ref, { credits: credit });
+    async updateCredits(credit) {
+      try {
+        const ref = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(ref, { credits: credit });
 
-    //     this.user.data.credits = credit;
-    //   } catch (error) {
-    //     console.log(errror);
-    //   }
-    // },
+        this.user.data.credits = credit;
+      } catch (error) {
+        console.log(errror);
+      }
+    },
 
     // updateFreeCredits(credit) {
     //   this.freeCredits = credit;

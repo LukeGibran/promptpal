@@ -25,12 +25,16 @@
         <q-toolbar-title class="text-dark"> </q-toolbar-title>
         <div
           class="credit-border"
-          :class="active ? 'text-positive active' : 'text-negative inactive'"
+          :class="
+            active || hasCredits
+              ? 'text-positive active'
+              : 'text-negative inactive'
+          "
           v-if="user.data && user.loggedIn"
         >
           <q-icon name="generating_tokens" />
           Credits:
-          {{ active ? "Unlimited" : "None" }}
+          {{ active ? "Unlimited" : hasCredits ? user.data.credits : "None" }}
         </div>
         <!-- <div
           class="custom-border credit-border free"
@@ -170,7 +174,7 @@ export default defineComponent({
       getSubscriptions,
       getSubscriptionPlans,
     } = subStore;
-    const { user } = storeToRefs(userStore);
+    const { user, hasCredits } = storeToRefs(userStore);
     const { active, subscriptionPlans, customer } = storeToRefs(subStore);
     const router = useRouter();
 
@@ -235,6 +239,7 @@ export default defineComponent({
       user,
       active,
       signOut,
+      hasCredits,
     };
   },
 });

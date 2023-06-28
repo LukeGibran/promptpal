@@ -27,30 +27,54 @@
               <q-card-section>
                 <q-card-main>
                   <div class="row q-mb-md q-px-sm">
-                    <div class="col-12">
+                    <q-btn
+                      color="info"
+                      label="Love Using PromptPal? Click Here"
+                      icon-right="favorite"
+                      @click="affLink = true"
+                    />
+                    <q-dialog v-model="affLink">
                       <q-card class="no-shadow" style="border: 1px solid #ccc">
                         <q-card-section>
-                          <div class="text-caption q-mb-xs">
-                            Your affiliate link:
+                          <div class="text-body2 q-mb-md">
+                            Love using PromptPal? Get rewarded for spreading the
+                            word! Share your unique link with friends, family
+                            and colleagues, and earn 20% of each person's
+                            lifetime subscription fees. Copy this link to share!
                           </div>
-                          <div class="row">
-                            <q-icon
-                              name="content_copy"
-                              class="cursor-pointer q-mr-sm"
-                              @click="copyText(affiliateLink)"
-                            >
-                            </q-icon>
-                            <div
-                              class="text-body2 text-info cursor-pointer"
-                              style="text-decoration: underline"
-                              @click="copyText(affiliateLink)"
-                            >
-                              {{ affiliateLink }}
-                            </div>
-                          </div>
+                          <q-card
+                            class="no-shadow"
+                            style="border: 1px solid #ccc"
+                          >
+                            <q-card-section>
+                              <div class="row">
+                                <q-icon
+                                  name="content_copy"
+                                  class="cursor-pointer q-mr-sm"
+                                  @click="copyText(affiliateLink)"
+                                >
+                                </q-icon>
+                                <div
+                                  class="text-body2 text-info cursor-pointer hover-underline"
+                                  @click="copyText(affiliateLink)"
+                                >
+                                  {{ affiliateLink }}
+                                </div>
+                              </div>
+                            </q-card-section>
+                          </q-card>
                         </q-card-section>
+                        <q-separator />
+                        <q-card-actions align="right">
+                          <q-btn
+                            flat
+                            label="Got it!"
+                            color="primary"
+                            v-close-popup
+                          />
+                        </q-card-actions>
                       </q-card>
-                    </div>
+                    </q-dialog>
                   </div>
                   <q-form>
                     <div class="row justify-between">
@@ -203,6 +227,7 @@ export default defineComponent({
     const password1 = ref("");
     const firstName = ref("");
     const inputRef = ref("");
+    const affLink = ref(false);
     const confirmPassword = ref("");
     const selectedOccupation = ref("");
     const selectedIndustry = ref(null);
@@ -465,6 +490,7 @@ export default defineComponent({
       email,
       rules,
       isPwd1,
+      affLink,
       copyText,
       lastName,
       password,

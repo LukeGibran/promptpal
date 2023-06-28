@@ -32,6 +32,7 @@
                       outlined
                       v-model="selectedIndustry"
                       :options="occupations"
+                      :rules="[rules.required]"
                       class="q-mb-md"
                       label="Select One:"
                     />
@@ -40,6 +41,7 @@
                       outlined
                       v-if="selectedIndustry"
                       v-model="selectedOccupation"
+                      :rules="[rules.required]"
                       :options="selectedIndustry.occupations"
                       class="q-mb-md"
                       label="Occupation:"

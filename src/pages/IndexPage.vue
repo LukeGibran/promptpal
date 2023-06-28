@@ -66,7 +66,7 @@
                 color="primary"
                 icon="refresh"
                 size="sm"
-                v-if="active"
+                v-if="checkActive"
                 :loading="loadingReg"
                 @click="regeneratePrompt()"
               >
@@ -121,7 +121,7 @@
         >
           <q-card
             class="no-shadow q-mb-md"
-            v-if="selectedPrompt.title && !active"
+            v-if="selectedPrompt.title && !checkActive"
             style="border: 1px solid #ccc"
           >
             <q-card-section>
@@ -149,7 +149,7 @@
         >
           <q-card
             class="no-shadow q-mb-md"
-            v-if="selectedPrompt.title && active"
+            v-if="selectedPrompt.title && checkActive"
             style="border: 1px solid #ccc"
           >
             <q-card-section class="q-pa-none">
@@ -160,7 +160,7 @@
                 :bar-style="barStyle"
                 class="q-pa-md"
               >
-                <q-card-main v-if="active">
+                <q-card-main v-if="checkActive">
                   <div
                     v-if="
                       selectedPrompt.title && selectedPrompt.inputs.length === 1
@@ -443,7 +443,8 @@ export default defineComponent({
     const { getMenus, getSubMenus, gettingSubMenus } = menuStore;
 
     const userStore = useUserStore();
-    const { user } = storeToRefs(userStore);
+    const { user, hasCredits } = storeToRefs(userStore);
+    const { updateCredits } = userStore;
 
     const subStore = useSubStore();
     const { active } = storeToRefs(subStore);
@@ -474,13 +475,9 @@ export default defineComponent({
       }
     });
 
-    // const hasCredits = computed(() => {
-    //   if (user.value.data && user.value.loggedIn) {
-    //     return !!user.value.data.credits;
-    //   }
-
-    //   return !!freeCredits.value;
-    // });
+    const checkActive = computed(() => {
+      return active.value ? active.value : hasCredits.value;
+    });
 
     function setHeight(inputsLength) {
       if (inputsLength == 1) return { height: "155px " };
@@ -507,6 +504,7 @@ export default defineComponent({
           content: res.data,
           date,
         });
+        checkCredit();
         // startTypewriter(, date);
         setTimeout(() => {
           scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
@@ -541,6 +539,7 @@ export default defineComponent({
           date,
         });
         // startTypewriter(, date);
+        checkCredit();
         setTimeout(() => {
           scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
         }, 400);
@@ -636,15 +635,11 @@ export default defineComponent({
       }
     }
 
-    // async function checkCredit() {
-    //   if (user.value.data && user.value.loggedIn) {
-    //     if (user.value.data.credits === -1) return;
+    async function checkCredit() {
+      if (active.value) return;
 
-    //     if (user.value.data.credits) updateCredits(user.value.data.credits - 1);
-    //   } else {
-    //     if (freeCredits.value) updateFreeCredits(freeCredits.value - 1);
-    //   }
-    // }
+      if (user.value.data.credits) updateCredits(user.value.data.credits - 1);
+    }
 
     return {
       user,
@@ -666,6 +661,7 @@ export default defineComponent({
       setHeight,
       loadingReg,
       _startCase,
+      checkActive,
       selectedMenu,
       conversation,
       submitPrompt,

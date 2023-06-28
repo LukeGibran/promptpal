@@ -24,7 +24,7 @@
                     </div>
                   </div>
                   <div class="col-9">
-                    <div class="text-h5">Terms & Service</div>
+                    <div class="text-h5">Terms & Conditions</div>
                     <div class="text-subtitle text-grey-7">
                       Effective Date: 27th June, 2023
                     </div>

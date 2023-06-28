@@ -25,31 +25,37 @@ export const useUserStore = defineStore("user", {
     user: {
       loggedIn: false,
       data: null,
+      id: null,
     },
     registering: false,
     loggingIn: false,
   }),
+  getters: {
+    affiliateLink: (state) =>
+      `${window.location.origin}/#/register?ref=${state.user.id}`,
+  },
   actions: {
     async register({
       email,
+      refBy,
+      lastName,
       password,
       firstName,
-      lastName,
-      occupation = "None",
       industryId,
+      occupation = "None",
     }) {
       this.registering = true;
 
       let data = {
+        refBy,
         email,
-        occupation,
-        credits: 3,
-        role: "user",
-        firstName,
         lastName,
+        firstName,
+        occupation,
         industryId,
-        displayName: `${firstName} ${lastName[0]}.`,
+        role: "user",
         updatedAt: Date.now(),
+        displayName: `${firstName} ${lastName[0]}.`,
       };
 
       const response = await createUserWithEmailAndPassword(
@@ -124,6 +130,7 @@ export const useUserStore = defineStore("user", {
     async fetchUser(user) {
       if (user) {
         this.user.loggedIn = user !== null;
+        this.user.id = user.uid;
       } else {
         this.user.data = null;
       }

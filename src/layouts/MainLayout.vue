@@ -13,14 +13,14 @@
         <router-link v-if="user.data && user.loggedIn" to="/">
           <q-btn class="text-info" flat label="Prompt" />
         </router-link>
-        <!-- <router-link v-if="user.data && user.loggedIn" to="profile">
-          <q-btn class="text-primary" flat label="Profile" />
-        </router-link> -->
         <router-link
           to="subscription"
           v-if="user.data && user?.data?.role != 'admin'"
         >
           <q-btn class="text-primary" flat label="Subscription" />
+        </router-link>
+        <router-link to="subscription" v-if="!user.data">
+          <q-btn class="text-primary" flat label="Our Pricing" />
         </router-link>
         <q-toolbar-title class="text-dark"> </q-toolbar-title>
         <div
@@ -128,10 +128,10 @@
             size="12px"
             class="text-primary"
             flat
-            label="Terms & Service"
+            label="Terms & Conditions"
           />
         </router-link>
-        <router-link to="">
+        <router-link to="privacypolicy">
           <q-btn
             size="12px"
             class="text-secondary"

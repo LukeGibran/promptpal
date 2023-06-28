@@ -26,6 +26,32 @@
               </q-card-section>
               <q-card-section>
                 <q-card-main>
+                  <div class="row q-mb-md q-px-sm">
+                    <div class="col-12">
+                      <q-card class="no-shadow" style="border: 1px solid #ccc">
+                        <q-card-section>
+                          <div class="text-caption q-mb-xs">
+                            Your affiliate link:
+                          </div>
+                          <div class="row">
+                            <q-icon
+                              name="content_copy"
+                              class="cursor-pointer q-mr-sm"
+                              @click="copyText(affiliateLink)"
+                            >
+                            </q-icon>
+                            <div
+                              class="text-body2 text-info cursor-pointer"
+                              style="text-decoration: underline"
+                              @click="copyText(affiliateLink)"
+                            >
+                              {{ affiliateLink }}
+                            </div>
+                          </div>
+                        </q-card-section>
+                      </q-card>
+                    </div>
+                  </div>
                   <q-form>
                     <div class="row justify-between">
                       <div class="col-6 q-px-sm">
@@ -152,8 +178,8 @@
   </q-page>
 </template>
 <script>
-import { useQuasar } from "quasar";
-import { ref, defineComponent, watch, onMounted } from "vue";
+import { useQuasar, copyToClipboard } from "quasar";
+import { ref, defineComponent, watch, onMounted, computed } from "vue";
 import { storeToRefs } from "pinia";
 import { useUserStore } from "stores/user";
 import { useRouter } from "vue-router";
@@ -167,10 +193,10 @@ export default defineComponent({
 
     const { updateBasicInfos, updateEmail, updateUserPass } = userStore;
 
-    const { user } = storeToRefs(userStore);
+    const { user, affiliateLink } = storeToRefs(userStore);
 
-    const isPwd = ref(true);
     const email = ref("");
+    const isPwd = ref(true);
     const isPwd1 = ref(true);
     const lastName = ref("");
     const password = ref("");
@@ -415,12 +441,31 @@ export default defineComponent({
       });
     }
 
+    async function copyText(text) {
+      try {
+        await copyToClipboard(text);
+        $q.notify({
+          message: "Link copied!",
+          color: "positive",
+          position: "top-right",
+        });
+      } catch (error) {
+        console.log(error);
+        $q.notify({
+          message: "Something went wrong. Please try again",
+          color: "negative",
+          position: "top-right",
+        });
+      }
+    }
+
     return {
       user,
       isPwd,
       email,
       rules,
       isPwd1,
+      copyText,
       lastName,
       password,
       inputRef,
@@ -428,6 +473,7 @@ export default defineComponent({
       firstName,
       askPassword,
       occupations,
+      affiliateLink,
       selectedIndustry,
       updateUserProfile,
       selectedOccupation,

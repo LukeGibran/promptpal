@@ -1,17 +1,17 @@
 <template>
   <q-page>
     <div class="row justify-center align-center">
-      <div class="col-3">
+      <div class="col-xs-12 col-sm-12 col-md-5 col-lg-3">
         <div class="row">
           <div class="col-12">
             <q-card
-              class="no-shadow q-px-md q-pb-md"
-              style="border: 1px solid #ccc; min-w"
+              class="no-shadow q-px-md q-pb-md custom-border remove-border"
             >
               <q-card-section>
                 <q-card-main>
                   <q-form ref="myForm">
-                    <div class="text-h4 q-mb-md">Register</div>
+                    <div class="text-h4 q-mb-md gt-sm">Register</div>
+                    <div class="text-h5 q-mb-md lt-sm">Register</div>
                     <q-input
                       outlined
                       v-model="firstName"
@@ -91,7 +91,7 @@
                       </template>
                     </q-input>
                     <div class="row justify-start items-start q-mb-md">
-                      <div class="col-1">
+                      <div class="col-1 q-mr-sm">
                         <q-checkbox
                           v-model="termsAgree"
                           color="secondary"
@@ -100,7 +100,7 @@
                           :rules="[rules.required]"
                         />
                       </div>
-                      <div class="col-11">
+                      <div class="col-10">
                         <div class="q-pt-sm">
                           By ticking, you are confirming that you have read,
                           understood and agree to our

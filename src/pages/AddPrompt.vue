@@ -200,13 +200,13 @@ export default defineComponent({
     const numberOfInput = ref(null);
 
     onMounted(() => {
-      window.document.body.style.overflow = "auto";
+      // window.document.body.style.overflow = "auto";
       !menus.value.length && getMenus();
     });
 
-    onBeforeUnmount(() => {
-      window.document.body.style.overflow = "hidden";
-    });
+    // onBeforeUnmount(() => {
+    //   window.document.body.style.overflow = "hidden";
+    // });
 
     async function submitSubMenu() {
       let inputs = [];

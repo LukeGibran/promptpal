@@ -11,6 +11,7 @@ export const useMenuStore = defineStore("menu", {
     loadingMenus: false,
     addingSubMenu: false,
     gettingSubMenus: false,
+    addingSuggestion: false,
   }),
   actions: {
     async addMenu() {
@@ -41,6 +42,7 @@ export const useMenuStore = defineStore("menu", {
     },
 
     async getMenus() {
+      this.menus = [];
       this.loadingMenus = true;
       try {
         const ref = collection(db, "menus");
@@ -108,6 +110,31 @@ export const useMenuStore = defineStore("menu", {
       } finally {
         this.gettingSubMenus = false;
         Loading.hide();
+      }
+    },
+    async addSuggestion(data, user) {
+      this.addingSuggestion = true;
+      try {
+        const ref = collection(db, "suggestions");
+        await addDoc(ref, {
+          email: user.email,
+          name: `${user.firstName} ${user.lastName}`,
+          suggestion: data,
+        });
+        Notify.create({
+          message: "Suggestion Added!",
+          color: "positive",
+          position: "top-right",
+        });
+      } catch (error) {
+        console.log(error);
+        Notify.create({
+          message: "Something went wrong. Please try again",
+          color: "negative",
+          position: "top-right",
+        });
+      } finally {
+        this.addingSuggestion = false;
       }
     },
   },

@@ -107,7 +107,12 @@
       </div>
 
       <div class="row justify-center q-mb-md" v-if="!active">
-        <div v-for="plan in subscriptionPlans" :key="plan.id" class="col-3">
+        <div
+          v-for="(plan, i) in subscriptionPlans"
+          :key="plan.id"
+          :style="{ order: i == 0 ? 2 : 1 }"
+          class="col-xs-12 col-sm-12 col-md-5 col-lg-3"
+        >
           <q-card class="subscription-card">
             <div
               v-if="plan.stripe_metadata_plan == 'annual'"
@@ -117,7 +122,9 @@
             </div>
 
             <q-card-section class="subscription-header">
-              <div class="text-h4 q-mt-xl">{{ plan.name }}</div>
+              <div class="text-h4 q-mt-xl padding_sm">
+                {{ plan.name }}
+              </div>
               <p class="price">{{ plan.pricing?.price }}</p>
               <p>{{ plan.description }}</p>
               <q-btn

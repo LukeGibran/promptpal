@@ -267,7 +267,6 @@ export const useSubStore = defineStore("subscription", {
       }
     },
     resetSubState() {
-      console.log(this);
       this.subscriptionPlans = [];
       this.subscriptions = [];
       this.payments = [];

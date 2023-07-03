@@ -1,17 +1,17 @@
 <template>
   <q-page>
     <div class="row justify-center items-center">
-      <div class="col-3">
+      <div class="col-xs-12 col-sm-12 col-md-5 col-lg-3">
         <div class="row">
           <div class="col-12">
             <q-card
-              class="no-shadow q-px-md q-pb-md"
-              style="border: 1px solid #ccc; min-w"
+              class="bg-transparent no-shadow q-px-md q-pb-md custom-border remove-border"
             >
               <q-card-section>
                 <q-card-main>
                   <q-form>
-                    <div class="text-h4 q-mb-md">Login</div>
+                    <div class="text-h4 q-mb-md gt-sm">Login</div>
+                    <div class="text-h5 q-mb-md lt-md">Login</div>
                     <q-input
                       outlined
                       v-model="email"

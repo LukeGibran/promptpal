@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <div class="row justify-center align-center">
-      <div class="col-6">
+      <div class="col-xs-12 col-sm-12 col-md-8 col-6">
         <div class="row">
           <div class="col-12">
             <q-card
@@ -78,7 +78,9 @@
                   </div>
                   <q-form>
                     <div class="row justify-between">
-                      <div class="col-6 q-px-sm">
+                      <div
+                        class="col-xs-12 col-sm-12 col-md-6 col-lg-6 q-px-xs"
+                      >
                         <q-input
                           outlined
                           v-model="firstName"
@@ -88,7 +90,9 @@
                           class="q-mb-md"
                         />
                       </div>
-                      <div class="col-6">
+                      <div
+                        class="col-xs-12 col-sm-12 col-md-6 col-lg-6 q-px-xs"
+                      >
                         <q-input
                           outlined
                           v-model="lastName"
@@ -100,7 +104,9 @@
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-6 q-px-sm">
+                      <div
+                        class="col-xs-12 col-sm-12 col-md-6 col-lg-6 q-px-xs"
+                      >
                         <q-select
                           outlined
                           v-model="selectedIndustry"
@@ -109,7 +115,9 @@
                           label="Select One:"
                         />
                       </div>
-                      <div class="col-6">
+                      <div
+                        class="col-xs-12 col-sm-12 col-md-6 col-lg-6 q-px-xs"
+                      >
                         <q-select
                           outlined
                           v-if="selectedIndustry"
@@ -121,7 +129,9 @@
                       </div>
                     </div>
                     <div class="row">
-                      <div class="col-6 q-px-sm">
+                      <div
+                        class="col-xs-12 col-sm-12 col-md-6 col-lg-6 q-px-xs"
+                      >
                         <q-input
                           outlined
                           v-model="email"
@@ -143,7 +153,9 @@
                   </q-form>
                   <q-form>
                     <div class="row q-mt-lg">
-                      <div class="col-6 q-px-sm">
+                      <div
+                        class="col-xs-12 col-sm-12 col-md-6 col-lg-6 q-px-xs"
+                      >
                         <q-input
                           outlined
                           ref="inputRef"
@@ -162,7 +174,9 @@
                           </template>
                         </q-input>
                       </div>
-                      <div class="col-6">
+                      <div
+                        class="col-xs-12 col-sm-12 col-md-6 col-lg-6 q-px-xs"
+                      >
                         <q-input
                           outlined
                           v-model="password1"

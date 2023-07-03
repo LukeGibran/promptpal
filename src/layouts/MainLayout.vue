@@ -7,24 +7,55 @@
             src="~assets/logo.png"
             style="height: 75px; width: 130px"
             fit="scale-down"
+            class="gt-sm"
           />
         </router-link>
+        <router-link to="/">
+          <q-img
+            src="~assets/logo.png"
+            style="height: 55px; width: 90px"
+            fit="scale-down"
+            class="lt-md"
+          />
+        </router-link>
+        <div
+          class="credit-border row items-center justif-center no-wrap lt-md"
+          :class="
+            active || hasCredits
+              ? 'text-positive active'
+              : 'text-negative inactive'
+          "
+          v-if="user.data && user.loggedIn"
+          style="gap: 5px"
+        >
+          <q-icon name="generating_tokens" />
+          {{
+            active
+              ? "unli"
+              : hasCredits
+              ? user.data.credits == -1
+                ? "unli"
+                : user.data.credits
+              : "none"
+          }}
+        </div>
         <div class="q-mx-lg"></div>
         <router-link v-if="user.data && user.loggedIn" to="/">
-          <q-btn class="text-info" flat label="Prompt" />
+          <q-btn class="text-info gt-sm" flat label="Prompt" />
         </router-link>
         <router-link
           to="subscription"
           v-if="user.data && user?.data?.role != 'admin'"
         >
-          <q-btn class="text-primary" flat label="Subscription" />
+          <q-btn class="text-primary gt-sm" flat label="Subscription" />
         </router-link>
         <router-link to="subscription" v-if="!user.data">
-          <q-btn class="text-primary" flat label="Our Pricing" />
+          <q-btn class="text-primary gt-sm" flat label="Our Pricing" />
         </router-link>
+
         <q-toolbar-title class="text-dark"> </q-toolbar-title>
         <div
-          class="credit-border"
+          class="credit-border gt-sm"
           :class="
             active || hasCredits
               ? 'text-positive active'
@@ -34,7 +65,15 @@
         >
           <q-icon name="generating_tokens" />
           Credits:
-          {{ active ? "Unlimited" : hasCredits ? user.data.credits : "None" }}
+          {{
+            active
+              ? "Unlimited"
+              : hasCredits
+              ? user.data.credits == -1
+                ? "Unlimited"
+                : user.data.credits
+              : "None"
+          }}
         </div>
         <!-- <div
           class="custom-border credit-border free"
@@ -45,18 +84,29 @@
         </div> -->
         <q-btn
           v-if="!user.loggedIn"
-          class="text-info"
+          class="text-info gt-sm"
           flat
           label="Login"
           to="login"
         />
         <q-btn
           v-if="!user.loggedIn"
-          class="text-primary"
+          class="text-primary gt-sm"
           flat
           label="Register"
           to="register"
         />
+        <q-btn
+          flat
+          @click="drawer = !drawer"
+          class="lt-md"
+          v-if="!user.data && !user.loggedIn"
+          round
+          dense
+          icon="menu"
+          color="grey-9"
+        />
+
         <q-btn-dropdown
           v-if="user.loggedIn && user.data"
           text-color="dark"
@@ -66,6 +116,43 @@
           id="dropdown-menu"
         >
           <q-list>
+            <q-item @click="$router.push('/')" clickable v-close-popup>
+              <q-item-section avatar>
+                <q-avatar
+                  icon="home"
+                  color="primary"
+                  text-color="white"
+                  size="md"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label style="font-size: 16px">Prompt</q-item-label>
+                <q-item-label caption>Enter a new prompt</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator />
+            <q-item
+              @click="$router.push('subscription')"
+              clickable
+              v-close-popup
+              v-if="user.data.role != 'admin'"
+            >
+              <q-item-section avatar>
+                <q-avatar
+                  icon="payments"
+                  color="info"
+                  text-color="white"
+                  size="md"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label style="font-size: 16px"
+                  >Subcriptions</q-item-label
+                >
+                <q-item-label caption>View your subscriptions</q-item-label>
+              </q-item-section>
+            </q-item>
+            <q-separator v-if="user.data.role != 'admin'" />
             <q-item @click="$router.push('profile')" clickable v-close-popup>
               <q-item-section avatar>
                 <q-avatar
@@ -119,6 +206,36 @@
         </q-btn-dropdown>
       </q-toolbar>
     </q-header>
+    <q-drawer
+      v-model="drawer"
+      :width="200"
+      :breakpoint="500"
+      overlay
+      bordered
+      class="lt-md"
+      :class="$q.dark.isActive ? 'bg-grey-9' : 'bg-grey-3'"
+      v-if="!user.data && !user.loggedIn"
+    >
+      <q-scroll-area class="fit">
+        <q-list v-if="!user.data && !user.loggedIn">
+          <template v-for="(menuItem, index) in menuList" :key="index">
+            <q-item clickable @click="$router.push(menuItem.route)" v-ripple>
+              <q-item-section avatar>
+                <q-avatar
+                  :color="menuItem.iconColor"
+                  text-color="white"
+                  :icon="menuItem.icon"
+                />
+              </q-item-section>
+              <q-item-section>
+                {{ menuItem.label }}
+              </q-item-section>
+            </q-item>
+            <q-separator :key="'sep' + index" v-if="menuItem.separator" />
+          </template>
+        </q-list>
+      </q-scroll-area>
+    </q-drawer>
     <q-page-container class="bg-app">
       <router-view />
     </q-page-container>
@@ -130,7 +247,7 @@
         <router-link to="terms">
           <q-btn
             size="12px"
-            class="text-primary"
+            class="text-primary gt-sm"
             flat
             label="Terms & Conditions"
           />
@@ -138,7 +255,23 @@
         <router-link to="privacypolicy">
           <q-btn
             size="12px"
-            class="text-secondary"
+            class="text-secondary gt-sm"
+            flat
+            label="Privacy Policy"
+          />
+        </router-link>
+        <router-link to="terms">
+          <q-btn
+            size="xs"
+            class="text-primary lt-md"
+            flat
+            label="Terms & Conditions"
+          />
+        </router-link>
+        <router-link to="privacypolicy">
+          <q-btn
+            size="xs"
+            class="text-secondary lt-md"
             flat
             label="Privacy Policy"
           />
@@ -161,9 +294,48 @@ import JSConfetti from "js-confetti";
 export default defineComponent({
   name: "MainLayout",
   setup() {
+    const drawer = ref(false);
     const userStore = useUserStore();
     const subStore = useSubStore();
     const jsConfetti = new JSConfetti();
+
+    const menuList = [
+      {
+        icon: "login",
+        label: "Login",
+        separator: false,
+        iconColor: "primary",
+        route: "login",
+      },
+      {
+        icon: "edit_note",
+        label: "Register",
+        separator: true,
+        iconColor: "secondary",
+        route: "register",
+      },
+      {
+        icon: "payments",
+        label: "Our Pricing",
+        separator: false,
+        iconColor: "primary",
+        route: "subscription",
+      },
+      {
+        icon: "feed",
+        label: "Terms & Condition",
+        separator: false,
+        iconColor: "secondary",
+        route: "terms",
+      },
+      {
+        icon: "policy",
+        label: "Privay Policy",
+        separator: false,
+        iconColor: "primary",
+        route: "privacypolicy",
+      },
+    ];
 
     const { fetchUser, logOut, getUserData } = userStore;
     const {
@@ -237,8 +409,10 @@ export default defineComponent({
 
     return {
       user,
+      drawer,
       active,
       signOut,
+      menuList,
       hasCredits,
     };
   },

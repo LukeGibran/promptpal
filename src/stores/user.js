@@ -34,6 +34,8 @@ export const useUserStore = defineStore("user", {
     affiliateLink: (state) =>
       `${window.location.origin}/#/register?ref=${state.user.id}`,
     hasCredits: (state) => {
+      if (state.user && state.user?.value?.data?.credits == -1) return true;
+
       if (state.user && state.user?.data?.credits)
         return !!state.user.data.credits;
     },

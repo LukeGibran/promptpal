@@ -1,7 +1,7 @@
 <template>
   <q-page>
     <div class="row justify-center align-center q-mb-lg">
-      <div class="col-5">
+      <div class="col-xs-12 col-12-sm col-md-8 col-lg-5">
         <div class="row">
           <div class="col-12">
             <q-card
@@ -36,10 +36,9 @@
               </q-card-section>
               <q-card-section class="q-pa-none">
                 <q-scroll-area
-                  style="height: 700px; max-height: 900px"
                   :thumb-style="thumbStyle"
                   :bar-style="barStyle"
-                  class="q-pa-md q-px-lg"
+                  class="q-pa-md q-px-lg terms-privacy-height"
                 >
                   <q-card-main>
                     <div class="text-body2 q-mb-sm">

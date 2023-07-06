@@ -52,6 +52,12 @@
         <router-link to="subscription" v-if="!user.data">
           <q-btn class="text-primary gt-sm" flat label="Our Pricing" />
         </router-link>
+        <q-btn
+          class="text-info gt-sm"
+          flat
+          label="Suggest a Prompt"
+          @click="suggestionPrompt = true"
+        />
 
         <q-toolbar-title class="text-dark"> </q-toolbar-title>
         <div
@@ -187,6 +193,26 @@
                 <q-item-label caption>Add new Menu/sub topic</q-item-label>
               </q-item-section>
             </q-item>
+            <q-separator v-if="user.data.role != 'admin'" />
+            <q-item
+              v-if="user.data.role != 'admin'"
+              @click="suggestionPrompt = true"
+              clickable
+              v-close-popup
+            >
+              <q-item-section avatar>
+                <q-avatar
+                  icon="lightbulb"
+                  color="yellow-9"
+                  text-color="white"
+                  size="md"
+                />
+              </q-item-section>
+              <q-item-section>
+                <q-item-label style="font-size: 16px">Suggest</q-item-label>
+                <q-item-label caption>You can suggest a prompt</q-item-label>
+              </q-item-section>
+            </q-item>
             <q-separator />
             <q-item clickable @click="signOut()" v-close-popup>
               <q-item-section avatar>
@@ -278,6 +304,36 @@
         </router-link>
       </q-toolbar>
     </q-footer>
+    <q-dialog v-model="suggestionPrompt" persistent>
+      <q-card style="min-width: 350px">
+        <q-card-section>
+          <div class="text-h6">Suggest a prompt</div>
+        </q-card-section>
+
+        <q-card-section class="q-pt-none">
+          <q-input
+            type="textarea"
+            outlined
+            dense
+            v-model="suggestion"
+            autofocus
+            @keyup.enter="suggestionPrompt = false"
+          />
+        </q-card-section>
+
+        <q-card-actions align="right" class="text-primary">
+          <q-btn color="grey-8" flat label="Close" v-close-popup />
+          <q-btn
+            :loading="addingSuggestion"
+            :disable="!suggestion"
+            color="secondary"
+            flat
+            label="Suggest"
+            @click="suggest"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-layout>
 </template>
 
@@ -288,6 +344,8 @@ import { storeToRefs } from "pinia";
 import { useUserStore } from "stores/user";
 import { useSubStore } from "stores/subscription";
 import { useRouter } from "vue-router";
+import { useMenuStore } from "stores/menu";
+import { useConversationStore } from "stores/conversation";
 import { useQuasar } from "quasar";
 import JSConfetti from "js-confetti";
 
@@ -295,9 +353,15 @@ export default defineComponent({
   name: "MainLayout",
   setup() {
     const drawer = ref(false);
+    const suggestion = ref("");
+    const suggestionPrompt = ref(false);
     const userStore = useUserStore();
     const subStore = useSubStore();
+    const menuStore = useMenuStore();
+    const convoStore = useConversationStore();
     const jsConfetti = new JSConfetti();
+    const { addingSuggestion } = storeToRefs(menuStore);
+    const { addSuggestion } = menuStore;
 
     const menuList = [
       {
@@ -348,6 +412,7 @@ export default defineComponent({
     } = subStore;
     const { user, hasCredits } = storeToRefs(userStore);
     const { active, subscriptionPlans, customer } = storeToRefs(subStore);
+    const { getConversations } = convoStore;
     const router = useRouter();
 
     const $q = useQuasar();
@@ -368,6 +433,8 @@ export default defineComponent({
         await fetchUser(user);
 
         await getUserData(user.uid);
+
+        await getConversations(user.uid);
 
         if (!subscriptionPlans?.value?.length) await getSubscriptionPlans();
 
@@ -407,6 +474,14 @@ export default defineComponent({
       router.push("/login");
     }
 
+    async function suggest() {
+      if (!suggestion.value) return;
+
+      await addSuggestion(suggestion.value, user.value.data);
+
+      suggestion.value = "";
+    }
+
     return {
       user,
       drawer,
@@ -414,6 +489,10 @@ export default defineComponent({
       signOut,
       menuList,
       hasCredits,
+      suggest,
+      suggestion,
+      addingSuggestion,
+      suggestionPrompt,
     };
   },
 });

@@ -120,6 +120,7 @@ export const useMenuStore = defineStore("menu", {
           email: user.email,
           name: `${user.firstName} ${user.lastName}`,
           suggestion: data,
+          updateAt: Date.now(),
         });
         Notify.create({
           message: "Suggestion Added!",

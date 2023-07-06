@@ -48,17 +48,19 @@
                           >
                             <q-card-section>
                               <div class="row">
-                                <q-icon
-                                  name="content_copy"
-                                  class="cursor-pointer q-mr-sm"
-                                  @click="copyText(affiliateLink)"
-                                >
-                                </q-icon>
-                                <div
-                                  class="text-body2 text-info cursor-pointer hover-underline"
-                                  @click="copyText(affiliateLink)"
-                                >
-                                  {{ affiliateLink }}
+                                <div class="col-12">
+                                  <q-icon
+                                    name="content_copy"
+                                    class="cursor-pointer q-mr-sm"
+                                    @click="copyText(affiliateLink)"
+                                  >
+                                  </q-icon>
+                                  <div
+                                    class="text-body2 text-info cursor-pointer hover-underline ellipsis"
+                                    @click="copyText(affiliateLink)"
+                                  >
+                                    {{ affiliateLink }}
+                                  </div>
                                 </div>
                               </div>
                             </q-card-section>

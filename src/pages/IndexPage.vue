@@ -79,6 +79,25 @@
     <!-- MOBILE VIEW -->
     <div class="row justify-center q-mb-sm lt-md menu">
       <div class="col-xs-12 col-md-8 col-lg-7 q-mb-sm q-px-md">
+        <div>
+          <q-select
+            outlined
+            input-debounce="0"
+            label="Search"
+            use-input
+            dense
+            v-model="searchVal"
+            class="q-mb-sm"
+            @filter="filterFn"
+            :options="labelSubMenus"
+          >
+            <template v-slot:no-option>
+              <q-item>
+                <q-item-section class="text-grey"> No results </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </div>
         <div ref="menuExpSm">
           <q-list bordered class="bg-white">
             <q-expansion-item
@@ -87,6 +106,7 @@
               :caption="
                 selectedMenu?.menu ? `${selectedMenu.menu}` : 'Choose a menu'
               "
+              ref="expMenuItemSm"
             >
               <q-separator />
               <q-virtual-scroll
@@ -129,6 +149,7 @@
                   : 'Choose a sub topic'
               "
               v-if="selectedMenu?.subMenus"
+              ref="expSubmenuItemSm"
             >
               <q-separator />
               <q-virtual-scroll
@@ -140,7 +161,7 @@
                   <q-item
                     :active="selectedPrompt?.title === item.title"
                     clickable
-                    @click="setPrompt(item)"
+                    @click="setPrompt(item, true)"
                   >
                     <q-item-section>
                       <q-item-label style="font-size: 14px">
@@ -187,6 +208,25 @@
             selectedMenu?.menu
           }}</span>
         </div> -->
+        <div>
+          <q-select
+            outlined
+            input-debounce="0"
+            label="Search"
+            use-input
+            dense
+            v-model="searchVal"
+            class="q-mb-sm"
+            @filter="filterFn"
+            :options="labelSubMenus"
+          >
+            <template v-slot:no-option>
+              <q-item>
+                <q-item-section class="text-grey"> No results </q-item-section>
+              </q-item>
+            </template>
+          </q-select>
+        </div>
         <div ref="menuExpLg">
           <q-list class="q-mb-sm bg-white" bordered style="border-radius: 4px">
             <q-expansion-item
@@ -195,6 +235,7 @@
               :caption="
                 selectedMenu?.menu ? `${selectedMenu.menu}` : 'Choose a menu'
               "
+              ref="expMenuItem"
             >
               <q-virtual-scroll
                 :items="_sortBy(menus)"
@@ -252,6 +293,7 @@
                   ? selectedPrompt.title
                   : 'Choose a sub topic'
               "
+              ref="expSubmenuItem"
             >
               <q-virtual-scroll
                 :items="selectedMenu?.subMenus"
@@ -262,7 +304,7 @@
                   <q-item
                     :active="selectedPrompt?.title === item.title"
                     clickable
-                    @click="setPrompt(item)"
+                    @click="setPrompt(item, true)"
                   >
                     <q-item-section>
                       <q-item-label style="font-size: 18px">
@@ -843,19 +885,26 @@ export default defineComponent({
     const subExpLg = ref("");
     const inputBox = ref("");
     const menuExpLg = ref("");
+    const searchVal = ref("");
     const menuExpSm = ref("");
     const affLink = ref(false);
     const loading = ref(false);
     const scrollRef = ref(null);
     const conversation = ref([]);
     const regenerateVal = ref("");
+    const expMenuItem = ref(null);
     const loadingReg = ref(false);
     const selectedMenu = ref(null);
     const typeWriterText = ref("");
     const selectedPrompt = ref({});
+    const expMenuItemSm = ref(null);
+    const expSubmenuItem = ref(null);
+    const expSubmenuItemSm = ref(null);
     const selectedSubMenu = ref(null);
     const prod = "https://api.promptpal.me/prompt";
     const dev = "http://localhost:5000/prompt";
+    const subMenusArr = subMenus.value;
+    const subMenusCopy = ref(subMenusArr);
 
     const $q = useQuasar();
 
@@ -893,9 +942,56 @@ export default defineComponent({
       { deep: true }
     );
 
+    watch(
+      () => searchVal.value,
+      (data) => {
+        if (data && typeof data == "object") {
+          selectedPrompt.value = {};
+          let subs = subMenus.value.filter((menu) => menu.type == data.type);
+          const menu = menus.value.find((m) => m === data.type);
+          setPrompt(data, false);
+
+          selectedMenu.value = {
+            menu,
+            subMenus: _sortBy(toRaw(subs), [
+              function (o) {
+                return o.title;
+              },
+            ]),
+          };
+        }
+      }
+    );
+
     const checkActive = computed(() => {
       return active.value ? active.value : hasCredits.value;
     });
+
+    const labelSubMenus = computed(() => {
+      return _sortBy(
+        subMenusCopy.value.map(({ title, type, prompt, inputs }) => ({
+          label: title,
+          type,
+          title,
+          prompt,
+          inputs,
+        })),
+        [
+          function (o) {
+            return o.label;
+          },
+        ]
+      );
+    });
+
+    function filterFn(val, update) {
+      update(() => {
+        const needle = val.toLowerCase();
+        subMenusCopy.value = subMenusArr.filter(
+          (v) => v.title.toLowerCase().indexOf(needle) > -1
+        );
+      });
+    }
 
     function startTour() {
       const tour = useShepherd({
@@ -1335,6 +1431,10 @@ export default defineComponent({
     }
 
     function setMenu(param) {
+      searchVal.value = null;
+      expMenuItem.value.hide();
+      expMenuItemSm.value.hide();
+
       selectedPrompt.value = {};
       let subs = subMenus.value.filter((menu) => menu.type == param);
       const menu = menus.value.find((m) => m === param);
@@ -1347,10 +1447,19 @@ export default defineComponent({
           },
         ]),
       };
+
+      setTimeout(() => {
+        expSubmenuItem.value.show();
+        expSubmenuItemSm.value.show();
+      }, 400);
     }
 
-    function setPrompt(val) {
+    function setPrompt(val, hide = false) {
       selectedPrompt.value = val;
+      if (hide) {
+        expSubmenuItem.value.hide();
+        expSubmenuItemSm.value.hide();
+      }
       input1.value = "";
       input2.value = "";
       input3.value = "";
@@ -1459,6 +1568,7 @@ export default defineComponent({
       setMenu,
       chatBox,
       subMenus,
+      filterFn,
       copyText,
       copyLink,
       subExpLg,
@@ -1468,20 +1578,26 @@ export default defineComponent({
       scrollRef,
       menuExpSm,
       setHeight,
+      searchVal,
       loadingReg,
       _startCase,
       checkActive,
       startTourLg,
+      expMenuItem,
       startTourSm,
       selectedMenu,
       conversation,
       submitPrompt,
+      labelSubMenus,
+      expMenuItemSm,
       affiliateLink,
       regenerateVal,
       typeWriterText,
       selectedPrompt,
+      expSubmenuItem,
       gettingSubMenus,
       selectedSubMenu,
+      expSubmenuItemSm,
       regeneratePrompt,
       gettingConversations,
 

@@ -133,22 +133,12 @@
             <q-expansion-item
               expand-separator
               label="Sub topic"
-              disable
-              caption="Choose a sub topic"
-              ref="subExpSm"
-              v-if="!selectedMenu?.subMenus"
-            >
-              <q-separator />
-            </q-expansion-item>
-            <q-expansion-item
-              expand-separator
-              label="Sub topic"
               :caption="
                 selectedPrompt?.title
                   ? selectedPrompt.title
                   : 'Choose a sub topic'
               "
-              v-if="selectedMenu?.subMenus"
+              :disable="!selectedMenu?.subMenus"
               ref="expSubmenuItemSm"
             >
               <q-separator />
@@ -262,31 +252,10 @@
         </div>
 
         <div ref="subExpLg">
-          <q-list
-            bordered
-            class="bg-white"
-            style="border-radius: 4px"
-            v-if="!selectedMenu?.subMenus"
-          >
-            <q-expansion-item
-              disable
-              expand-separator
-              label="Sub topic"
-              caption="Choose a sub topic"
-            >
-            </q-expansion-item>
-          </q-list>
-        </div>
-
-        <div ref="subExpLg1">
-          <q-list
-            bordered
-            class="bg-white"
-            style="border-radius: 4px"
-            v-if="selectedMenu?.subMenus"
-          >
+          <q-list bordered class="bg-white" style="border-radius: 4px">
             <q-expansion-item
               expand-separator
+              :disable="!selectedMenu?.subMenus"
               label="Sub topic"
               :caption="
                 selectedPrompt?.title

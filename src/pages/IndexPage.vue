@@ -1266,6 +1266,7 @@ export default defineComponent({
 
         let i = 0;
         let date = Date.now();
+        scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
         sse.addEventListener("message", ({ data }) => {
           let msgObj = JSON.parse(data);
           if (i == 0)
@@ -1300,7 +1301,6 @@ export default defineComponent({
                 user.value.id
               );
               loading.value = false;
-              scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
             }, 1500);
           } else {
             await addConversation(
@@ -1312,7 +1312,6 @@ export default defineComponent({
               user.value.id
             );
             loading.value = false;
-            scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
           }
 
           regenerateVal.value = prompt.value;
@@ -1353,6 +1352,7 @@ export default defineComponent({
 
         let i = 0;
         let date = Date.now();
+        scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
         sse.addEventListener("message", ({ data }) => {
           let msgObj = JSON.parse(data);
           if (i == 0)
@@ -1378,11 +1378,9 @@ export default defineComponent({
             setTimeout(() => {
               currentConvo.content = parsed;
               loadingReg.value = false;
-              scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
             }, 1500);
           } else {
             loadingReg.value = false;
-            scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
           }
 
           sse.close();
@@ -1479,7 +1477,10 @@ export default defineComponent({
 
     async function copyText(text) {
       try {
-        const removeHTMLTags = text.replace(/<\/?[^>]+>/gi, "");
+        let removeHTMLTags;
+        removeHTMLTags = text.replace(/<\/?[^>]+>/gi, "");
+        removeHTMLTags = removeHTMLTags.replace(/&quot;/g, '"');
+        removeHTMLTags = removeHTMLTags.replace(/&#39;/g, "'");
 
         await copyToClipboard(removeHTMLTags);
         $q.notify({

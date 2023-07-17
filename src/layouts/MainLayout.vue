@@ -412,7 +412,7 @@ export default defineComponent({
     } = subStore;
     const { user, hasCredits } = storeToRefs(userStore);
     const { active, subscriptionPlans, customer } = storeToRefs(subStore);
-    const { getConversations } = convoStore;
+    const { getConversations, getFileConversations } = convoStore;
     const router = useRouter();
 
     const $q = useQuasar();
@@ -435,6 +435,8 @@ export default defineComponent({
         await getUserData(user.uid);
 
         await getConversations(user.uid);
+
+        await getFileConversations(user.uid);
 
         if (!subscriptionPlans?.value?.length) await getSubscriptionPlans();
 

@@ -14,6 +14,7 @@ import {
 import {
   getFirestore,
   onSnapshot,
+  arrayUnion,
   collection,
   updateDoc,
   orderBy,
@@ -68,6 +69,7 @@ export {
   getDocs,
   updateDoc,
   functions,
+  arrayUnion,
   onSnapshot,
   collection,
   updateEmail,

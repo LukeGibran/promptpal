@@ -24,32 +24,57 @@
       </div>
     </div> -->
     <div class="row justify-center">
-      <div class="gt-sm col-xs-10 col-md-11 col-lg-7">
-        <div class="row justify-end">
-          <q-btn
-            flat
-            color="info"
-            label="Love Using PromptPal? Click Here"
-            size="12px"
-            icon-right="favorite"
-            class="love-btn"
-            @click="affLink = true"
-          />
-          <q-btn
-            flat
-            icon-right="help"
-            label="How To Use PromptPal"
-            size="12px"
-            color="grey-8"
-            class="love-btn"
-            @click="startTourLg()"
-          />
-          <!-- <q-fab-action
+      <div class="gt-sm col-md-3 col-lg-2">
+        <div class="row justify-center q-mb-sm"></div>
+      </div>
+      <div class="gt-sm col-xs-11 col-sm-12 col-md-8 col-lg-6">
+        <div class="row justify-between">
+          <div>
+            <q-btn-group push unelevated>
+              <q-btn
+                :color="chatType == 'chat' ? 'green-7' : 'grey-8'"
+                text-color="white"
+                size="sm"
+                label="Chat"
+                @click="setChatType('chat')"
+                icon="chat"
+              />
+              <q-btn
+                :color="chatType == 'files' ? 'green-7' : 'grey-8'"
+                size="sm"
+                text-color="white"
+                icon="image"
+                @click="setChatType('files')"
+                label="Files"
+              />
+            </q-btn-group>
+          </div>
+          <div>
+            <q-btn
+              flat
+              color="info"
+              label="Love Using PromptPal? Click Here"
+              size="12px"
+              icon-right="favorite"
+              class="love-btn"
+              @click="affLink = true"
+            />
+            <q-btn
+              flat
+              icon-right="help"
+              label="How To Use PromptPal"
+              size="12px"
+              color="grey-8"
+              class="love-btn"
+              @click="startTourLg()"
+            />
+            <!-- <q-fab-action
               label="Start tutorial"
               color="secondary"
               padding="xs"
               icon="play_arrow"
             /> -->
+          </div>
         </div>
       </div>
       <div class="lt-md col-xs-10 col-md-8 col-lg-7">
@@ -191,7 +216,7 @@
     </div>
     <!-- END MOBILE VIEW -->
     <div class="row justify-center">
-      <div class="col-md-3 col-lg-2 q-px-sm gt-sm">
+      <div class="col-md-3 col-lg-2 q-px-sm gt-sm" v-if="chatType == 'chat'">
         <!-- <div class="text-body1 q-mb-sm" v-if="selectedMenu">
           Menu:
           <span class="credit-border text-positive active blue">{{
@@ -314,13 +339,44 @@
           </q-list>
         </div>
       </div>
-      <div class="col-xs-11 col-sm-12 col-md-8 col-lg-5">
+      <div class="col-md-3 col-lg-2 q-px-sm gt-sm" v-else>
+        <q-list class="q-mb-sm bg-white" bordered style="border-radius: 4px">
+          <q-expansion-item
+            expand-separator
+            label="Your Files"
+            caption="Your uploaded files are here"
+            ref="expMenuItem"
+          >
+            <q-virtual-scroll
+              :items="fileConversations"
+              v-slot="{ item, index }"
+              style="max-height: 300px"
+            >
+              <div :key="index" class="q-px-sm">
+                <q-item
+                  :active="sourceId == item.sourceId"
+                  clickable
+                  @click="setSourceId(item)"
+                >
+                  <q-item-section>
+                    <q-item-label style="font-size: 14px">
+                      {{ item.name }}
+                    </q-item-label>
+                  </q-item-section>
+                </q-item>
+                <q-separator v-if="index + 1 != fileConversations.length" />
+              </div>
+            </q-virtual-scroll>
+          </q-expansion-item>
+        </q-list>
+      </div>
+      <div class="col-xs-11 col-sm-12 col-md-8 col-lg-6">
         <div
           class="content custom-border q-mb-md"
           :class="conversation.length && 'active'"
           ref="chatBox"
         >
-          <q-card class="q-mb-sm no-shadow" style="min-height: 450px">
+          <q-card class="q-mb-sm no-shadow" style="min-height: 550px">
             <q-card-section>
               <div class="row justify-between">
                 <div class="text-subtitle1">
@@ -368,11 +424,11 @@
                   ref="scrollRef"
                   :items="conversation"
                   v-slot="{ item, index }"
-                  style="max-height: 350px"
+                  style="max-height: 450px"
                 >
                   <transition appear enter-active-class="animated fadeInUp">
                     <q-item :key="index" style="padding-left: 0 !important">
-                      <q-item-section>
+                      <q-item-section v-if="item.role === 'assistant'">
                         <q-chat-message
                           name="PromptPal"
                           avatar="~/assets/logo_initial.png"
@@ -387,7 +443,19 @@
                           <q-btn
                             flat
                             rounded
-                            color="dark"
+                            color="grey-7"
+                            :disable="loading"
+                            icon="inventory_2"
+                            size="xs"
+                            @click="archiveChat(item)"
+                          >
+                            <q-tooltip class="bg-dark">Archive Chat</q-tooltip>
+                          </q-btn>
+
+                          <q-btn
+                            flat
+                            rounded
+                            color="grey-7"
                             icon="content_copy"
                             size="xs"
                             @click="copyText(item.content)"
@@ -395,6 +463,17 @@
                             <q-tooltip class="bg-dark">Copy Response</q-tooltip>
                           </q-btn>
                         </div>
+                      </q-item-section>
+                      <q-item-section
+                        v-if="item.role === 'info'"
+                        class="q-ml-xl q-px-xl text-white"
+                      >
+                        <q-banner dense class="bg-grey-5">
+                          <template v-slot:avatar>
+                            <q-icon name="info" color="white" />
+                          </template>
+                          {{ item.content }}
+                        </q-banner>
                       </q-item-section>
                     </q-item>
                   </transition>
@@ -404,7 +483,7 @@
           </q-card>
         </div>
         <transition
-          enter-active-class="animated fadeInDown"
+          enter-active-class="animated fadeIn"
           leave-active-class="animated fadeOut"
         >
           <q-card
@@ -429,34 +508,33 @@
             </q-card-section>
           </q-card>
         </transition>
-        <transition
-          appear
-          enter-active-class="animated fadeIn"
-          leave-active-class="animated fadeOutDown"
-        >
-          <div ref="inputBox">
-            <q-card
-              class="no-shadow q-mb-md q-pa-md custom-border"
-              v-if="!selectedPrompt.title && checkActive"
-            >
-              <q-card-section class="q-pa-none">
-                <q-card-main>
-                  <div>
-                    <q-input
-                      class="q-mb-sm"
-                      v-model="input1"
-                      placeholder="keyword"
-                      hint="Enter a keyword"
-                      outlined
-                      :disable="true"
-                    ></q-input>
-                  </div>
-                  <div class="row justify-end">
-                    <q-btn :disable="true" label="Generate" color="secondary" />
-                  </div>
-                </q-card-main>
-              </q-card-section>
-            </q-card>
+        <div>
+          <div ref="inputBox" v-if="chatType === 'chat'">
+            <div v-if="!selectedPrompt.title && checkActive">
+              <q-card class="no-shadow q-mb-md q-pa-md custom-border">
+                <q-card-section class="q-pa-none" v-if="chatType == 'chat'">
+                  <q-card-main>
+                    <div>
+                      <q-input
+                        class="q-mb-sm"
+                        v-model="input1"
+                        placeholder="keyword"
+                        hint="Enter a keyword"
+                        outlined
+                        :disable="true"
+                      ></q-input>
+                    </div>
+                    <div class="row justify-end">
+                      <q-btn
+                        :disable="true"
+                        label="Generate"
+                        color="secondary"
+                      />
+                    </div>
+                  </q-card-main>
+                </q-card-section>
+              </q-card>
+            </div>
             <q-card
               class="no-shadow q-mb-md q-pa-md custom-border"
               v-if="selectedPrompt.title && checkActive"
@@ -732,7 +810,64 @@
               </q-card-section>
             </q-card>
           </div>
-        </transition>
+
+          <div v-else>
+            <q-card class="custom-border no-shadow q-pa-md">
+              <q-card-section class="q-pa-none">
+                <q-card-main>
+                  <q-file
+                    class="q-mb-md"
+                    filled
+                    bottom-slots
+                    label="Pick your file"
+                    v-model="fileModel"
+                    ref="fileRef"
+                    @update:model-value="($event) => fileAdded($event)"
+                    counter
+                    max-files="1"
+                  >
+                    <template v-slot:before>
+                      <q-icon name="description" />
+                    </template>
+
+                    <template v-slot:hint>
+                      You can upload your files here
+                    </template>
+
+                    <template v-slot:append>
+                      <q-btn round dense flat icon="add" @click.stop.prevent />
+                    </template>
+                  </q-file>
+
+                  <q-input
+                    class="q-mb-sm"
+                    v-model="input1"
+                    placeholder="Ask a Question"
+                    :disable="!sourceId"
+                    :loading="loading"
+                    outlined
+                    autogrow
+                  ></q-input>
+                  <div class="row justify-end">
+                    <q-btn
+                      label="Ask your document a question"
+                      color="secondary"
+                      :loading="loading"
+                      :disable="!sourceId"
+                      @click.prevent="askChatPDF"
+                    />
+                  </div>
+                </q-card-main>
+              </q-card-section>
+              <q-inner-loading
+                :showing="uploadingFile"
+                label="Uploading your file"
+                label-class="text-secondary"
+                label-style="font-size: 1.1em"
+              />
+            </q-card>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -821,8 +956,8 @@ import "../css/shepherd.css";
 import _startCase from "lodash/startCase";
 import _sortBy from "lodash/sortBy";
 import { useRouter } from "vue-router";
-import { api } from "boot/axios";
 import { marked } from "marked";
+import axios from "axios";
 
 export default defineComponent({
   name: "ChatPage",
@@ -840,9 +975,16 @@ export default defineComponent({
     const { active } = storeToRefs(subStore);
 
     const conversationStore = useConversationStore();
-    const { conversations, gettingConversations } =
+    const { conversations, gettingConversations, fileConversations } =
       storeToRefs(conversationStore);
-    const { addConversation, getConversations } = conversationStore;
+    const {
+      archiveNewConv,
+      addConversation,
+      updatefileConvo,
+      getConversations,
+      archiveChatAsync,
+      addFileConversation,
+    } = conversationStore;
 
     const prompt = ref("");
     const input1 = ref("");
@@ -852,13 +994,17 @@ export default defineComponent({
     const input5 = ref("");
     const chatBox = ref("");
     const subExpLg = ref("");
+    const sourceId = ref("");
     const inputBox = ref("");
     const menuExpLg = ref("");
     const searchVal = ref("");
     const menuExpSm = ref("");
+    const fileRef = ref(null);
+    const fileModel = ref(null);
     const affLink = ref(false);
     const loading = ref(false);
     const scrollRef = ref(null);
+    const chatType = ref("chat");
     const conversation = ref([]);
     const regenerateVal = ref("");
     const expMenuItem = ref(null);
@@ -867,6 +1013,8 @@ export default defineComponent({
     const typeWriterText = ref("");
     const selectedPrompt = ref({});
     const expMenuItemSm = ref(null);
+    const fileConversation = ref([]);
+    const uploadingFile = ref(false);
     const expSubmenuItem = ref(null);
     const expSubmenuItemSm = ref(null);
     const selectedSubMenu = ref(null);
@@ -1021,7 +1169,7 @@ export default defineComponent({
 
       tour.addStep({
         attachTo: { element: chatBox.value, on: "top" },
-        text: "Then PrompPal's respond will be displayed here",
+        text: "Then PrompPal's response will be displayed here",
         arrow: true,
         buttons: [
           {
@@ -1117,7 +1265,7 @@ export default defineComponent({
 
       tour.addStep({
         attachTo: { element: chatBox.value, on: "top" },
-        text: "Then PrompPal's respond will be displayed here",
+        text: "Then PrompPal's response will be displayed here",
         arrow: true,
         buttons: [
           {
@@ -1168,7 +1316,7 @@ export default defineComponent({
 
       tour.addStep({
         attachTo: { element: chatBox.value, on: "bottom" },
-        text: "Then PrompPal's respond will be displayed here",
+        text: "Then PrompPal's response will be displayed here",
         arrow: true,
         buttons: [
           {
@@ -1191,6 +1339,65 @@ export default defineComponent({
       else return { height: "330px" };
     }
 
+    async function askChatPDF() {
+      if (!input1.value) return;
+      loading.value = true;
+
+      try {
+        const sse = new EventSource(
+          `${prod}/chatfile?query=${input1.value}&sourceId=${sourceId.value}`
+        );
+
+        let i = 0;
+        let date = Date.now();
+        scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
+        sse.addEventListener("message", ({ data }) => {
+          let msgObj = JSON.parse(data);
+
+          if (i == 0) {
+            conversation.value.push({
+              role: "assistant",
+              content: msgObj.text,
+              date,
+            });
+          } else {
+            let currentConvo = conversation.value.find((c) => c.date === date);
+            currentConvo.content += msgObj.text;
+          }
+
+          i++;
+        });
+        sse.addEventListener("error", async ({ data }) => {
+          let currentConvo = conversation.value.find((c) => c.date === date);
+          await addConversation(
+            {
+              role: "assistant",
+              content: currentConvo.content,
+              date,
+            },
+            user.value.id
+          );
+
+          updatefileConvo(sourceId.value, {
+            role: "user",
+            content: currentConvo.content,
+          });
+
+          loading.value = false;
+          regenerateVal.value = prompt.value;
+          prompt.value = "";
+          sse.close();
+        });
+        checkCredit();
+      } catch (error) {
+        console.log(e);
+        $q.notify({
+          message: "Something went wrong. Please try again",
+          color: "negative",
+          position: "top-right",
+        });
+      }
+    }
     async function submitPrompt() {
       if (!input1.value) return;
 
@@ -1522,6 +1729,80 @@ export default defineComponent({
       }
     }
 
+    function setChatType(val) {
+      conversation.value.push({
+        role: "info",
+        content: `You set the type to ${val} only`,
+      });
+      chatType.value = val;
+
+      setTimeout(() => {
+        scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
+      }, 200);
+    }
+
+    async function fileAdded(val) {
+      if (val) {
+        const formData = new FormData();
+        formData.append("file", val);
+
+        try {
+          uploadingFile.value = true;
+          const res = await axios.post(`${prod}/upload`, formData);
+          sourceId.value = res.data.sourceId;
+
+          await addFileConversation(
+            {
+              sourceId: res.data.sourceId,
+              name: res.data.originalFilename,
+              filename: res.data.filename,
+              messages: [],
+            },
+            user.value.id
+          );
+          conversation.value.push({
+            role: "info",
+            content: `Success! You can now ask PromptPal about your file ${res.data.originalFilename}`,
+          });
+
+          setTimeout(() => {
+            scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
+          }, 200);
+        } catch (error) {
+          console.log(error);
+        } finally {
+          uploadingFile.value = false;
+          fileModel.value = null;
+        }
+      }
+    }
+
+    function setSourceId(item) {
+      sourceId.value = item.sourceId;
+      conversation.value.push({
+        role: "info",
+        content: `You've selected ${item.name}`,
+      });
+
+      setTimeout(() => {
+        scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
+      }, 200);
+    }
+
+    async function archiveChat(item) {
+      conversation.value = conversation.value.filter((c) => c.id != item.id);
+      $q.notify({
+        message: "Chat successfully archived",
+        color: "positive",
+        position: "top-right",
+      });
+      if (item.id) {
+        await archiveChatAsync(item.id);
+      } else {
+        await archiveNewConv({ ...item, user: user.value.id });
+      }
+    }
+
     return {
       user,
       menus,
@@ -1536,21 +1817,30 @@ export default defineComponent({
       loading,
       affLink,
       setMenu,
+      fileRef,
       chatBox,
+      chatType,
       subMenus,
       filterFn,
       copyText,
       copyLink,
       subExpLg,
       inputBox,
+      sourceId,
+      fileAdded,
       setPrompt,
       menuExpLg,
       scrollRef,
       menuExpSm,
       setHeight,
       searchVal,
+      fileModel,
+      askChatPDF,
       loadingReg,
       _startCase,
+      archiveChat,
+      setChatType,
+      setSourceId,
       checkActive,
       startTourLg,
       expMenuItem,
@@ -1558,6 +1848,7 @@ export default defineComponent({
       selectedMenu,
       conversation,
       submitPrompt,
+      uploadingFile,
       labelSubMenus,
       expMenuItemSm,
       affiliateLink,
@@ -1569,6 +1860,7 @@ export default defineComponent({
       selectedSubMenu,
       expSubmenuItemSm,
       regeneratePrompt,
+      fileConversations,
       gettingConversations,
 
       thumbStyle: {

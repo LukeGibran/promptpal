@@ -14,7 +14,7 @@
                     <div class="column content-center">
                       <q-img
                         src="~assets/logo_initial.png"
-                        style="height: 75px; width: 130px"
+                        style="height: 55px; width: 130px"
                         fit="scale-down"
                       />
                       <div class="text-subtitle2 text-center">

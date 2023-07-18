@@ -56,6 +56,7 @@
           class="text-info gt-sm"
           flat
           label="Suggest a Prompt"
+          v-if="user.data && user.loggedIn"
           @click="suggestionPrompt = true"
         />
 

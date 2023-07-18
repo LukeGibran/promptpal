@@ -35,18 +35,40 @@
                 :color="chatType == 'chat' ? 'green-7' : 'grey-8'"
                 text-color="white"
                 size="sm"
-                label="Chat"
+                label="Prompt Assist"
                 @click="setChatType('chat')"
                 icon="chat"
-              />
+              >
+                <q-tooltip class="bg-green-8">Ask PromptPal anything</q-tooltip>
+              </q-btn>
+              <q-separator style="margin-right: 1px" />
+
               <q-btn
                 :color="chatType == 'files' ? 'green-7' : 'grey-8'"
                 size="sm"
                 text-color="white"
-                icon="image"
+                icon="description"
                 @click="setChatType('files')"
-                label="Files"
-              />
+                label="PDF Assist"
+              >
+                <q-tooltip class="bg-green-8"
+                  >Ask PromptPal to summarize your PDF file</q-tooltip
+                >
+              </q-btn>
+              <q-separator style="margin-right: 1px" />
+
+              <q-btn
+                :color="chatType == 'presentation' ? 'green-7' : 'grey-8'"
+                size="sm"
+                text-color="white"
+                icon="co_present"
+                @click="setChatType('presentation')"
+                label="PowerPoint Assist"
+              >
+                <q-tooltip class="bg-green-8"
+                  >Ask PromptPal to generate a powerpoint</q-tooltip
+                >
+              </q-btn>
             </q-btn-group>
           </div>
           <div>
@@ -339,7 +361,10 @@
           </q-list>
         </div>
       </div>
-      <div class="col-md-3 col-lg-2 q-px-sm gt-sm" v-else>
+      <div
+        class="col-md-3 col-lg-2 q-px-sm gt-sm"
+        v-else-if="chatType == 'files'"
+      >
         <q-list class="q-mb-sm bg-white" bordered style="border-radius: 4px">
           <q-expansion-item
             expand-separator
@@ -370,6 +395,18 @@
           </q-expansion-item>
         </q-list>
       </div>
+      <div class="col-md-3 col-lg-2 q-px-sm gt-sm" v-else>
+        <q-card class="custom-border q-pa-md no-shadow">
+          <div class="text-h6">Sample Format</div>
+          <q-separator class="q-mb-sm" />
+          <div
+            class="text-body2 text-grey-8"
+            v-html="
+              'Slide 1: Title Page: Benefits of a High Protein Diet <br/> <br/> Slide 2: Title: Introduction <ul><li>The role of protein in our diet</li> <li>Importance of consuming adequate protein</li> <li>Benefits of a high protein</li></ul>'
+            "
+          ></div>
+        </q-card>
+      </div>
       <div class="col-xs-11 col-sm-12 col-md-8 col-lg-6">
         <div
           class="content custom-border q-mb-md"
@@ -396,7 +433,7 @@
                     :loading="loadingReg"
                     @click="regeneratePrompt()"
                   >
-                    <q-tooltip class="bg-dark">Regenerate</q-tooltip>
+                    <q-tooltip class="bg-grey-8">Regenerate</q-tooltip>
                   </q-btn>
                 </div>
               </div>
@@ -441,6 +478,22 @@
                         </q-chat-message>
                         <div class="row justify-end">
                           <q-btn
+                            @click="generatePPTX(item.content)"
+                            v-if="item?.generatePptx"
+                            color="white"
+                            unelevated
+                            size="sm"
+                            icon="download"
+                            :disable="loading"
+                            text-color="green-8"
+                            label="Download PowerPoint"
+                          >
+                            <q-tooltip class="bg-grey-8"
+                              >Generate a presentation using this
+                              response</q-tooltip
+                            >
+                          </q-btn>
+                          <q-btn
                             flat
                             rounded
                             color="grey-7"
@@ -449,7 +502,9 @@
                             size="xs"
                             @click="archiveChat(item)"
                           >
-                            <q-tooltip class="bg-dark">Archive Chat</q-tooltip>
+                            <q-tooltip class="bg-grey-8"
+                              >Archive Chat</q-tooltip
+                            >
                           </q-btn>
 
                           <q-btn
@@ -460,7 +515,9 @@
                             size="xs"
                             @click="copyText(item.content)"
                           >
-                            <q-tooltip class="bg-dark">Copy Response</q-tooltip>
+                            <q-tooltip class="bg-grey-8"
+                              >Copy Response</q-tooltip
+                            >
                           </q-btn>
                         </div>
                       </q-item-section>
@@ -811,7 +868,7 @@
             </q-card>
           </div>
 
-          <div v-else>
+          <div v-else-if="chatType === 'files'">
             <q-card class="custom-border no-shadow q-pa-md">
               <q-card-section class="q-pa-none">
                 <q-card-main>
@@ -819,10 +876,12 @@
                     class="q-mb-md"
                     filled
                     bottom-slots
-                    label="Pick your file"
+                    label="Upload your file"
                     v-model="fileModel"
                     ref="fileRef"
                     @update:model-value="($event) => fileAdded($event)"
+                    @rejected="onRejected"
+                    :filter="checkFileType"
                     counter
                     max-files="1"
                   >
@@ -865,6 +924,141 @@
                 label-class="text-secondary"
                 label-style="font-size: 1.1em"
               />
+            </q-card>
+          </div>
+          <div v-else>
+            <q-card class="custom-border no-shadow q-pa-md q-mb-md">
+              <q-card-section class="q-pa-none">
+                <q-card-main>
+                  <div class="row q-mb-md">
+                    <q-btn-group push unelevated>
+                      <q-btn
+                        :color="pptType == 'ai' ? 'primary' : 'grey-8'"
+                        text-color="white"
+                        size="sm"
+                        label="Generate Presentation with PromptPal"
+                        @click="setPptType('ai')"
+                        icon="chat"
+                      >
+                        <q-tooltip class="bg-primary"
+                          >Ask PromptPal to create a powerpoint for
+                          you</q-tooltip
+                        >
+                      </q-btn>
+                      <q-separator style="margin-right: 1px" />
+
+                      <q-btn
+                        :color="pptType == 'user' ? 'primary' : 'grey-8'"
+                        size="sm"
+                        text-color="white"
+                        icon="account_circle"
+                        @click="setPptType('user')"
+                        label="Paste Your Own Presentation Outline"
+                      >
+                        <q-tooltip class="bg-primary"
+                          >Create your own powerpooint
+                        </q-tooltip>
+                      </q-btn>
+                    </q-btn-group>
+                  </div>
+                  <div v-if="pptType == 'ai'">
+                    <div class="row q-mb-sm">
+                      <div class="text-body2">
+                        Fill in the required fields below to let
+                        <span class="prompt-color">Prompt </span>
+                        <span class="pal-color">Pal</span>
+                        generate an outline for your presentation!
+                        <q-btn
+                          unelevated
+                          text-color="grey-8"
+                          icon="help"
+                          size="8px"
+                          padding="0"
+                          flat
+                          style="margin-bottom: 1px"
+                        >
+                          <q-tooltip class="bg-grey-8"
+                            >If you want to create your own, click the "user"
+                            button</q-tooltip
+                          >
+                        </q-btn>
+                      </div>
+                    </div>
+                    <q-input
+                      autogrow
+                      class="q-mb-sm"
+                      v-model="input1"
+                      outlined
+                      placeholder="Describe the Subject area"
+                      hint="e.g. mathematics"
+                    ></q-input>
+                    <q-input
+                      autogrow
+                      class="q-mb-sm"
+                      v-model="input2"
+                      outlined
+                      placeholder="What is the presentation about"
+                      hint="e.g. distributive law and the index laws to factorise algebraic expressions"
+                    ></q-input>
+                    <q-input
+                      autogrow
+                      class="q-mb-sm"
+                      v-model="input3"
+                      outlined
+                      placeholder="Enter the number of Slides"
+                      hint="e.g. 5"
+                    ></q-input>
+                    <div class="row justify-end" style="gap: 0.8rem">
+                      <q-btn
+                        :disable="!input1 && !input2 && !input3"
+                        label="Generate"
+                        color="secondary"
+                        :loading="loading"
+                        @click="submitPrompt"
+                      />
+                    </div>
+                  </div>
+
+                  <div v-else>
+                    <div class="row q-mb-sm">
+                      <div class="text-body2">
+                        You can paste/type your outline below, just make sure to
+                        follow the sample format displayed on your left.
+                        <q-btn
+                          unelevated
+                          text-color="grey-8"
+                          icon="help"
+                          size="8px"
+                          padding="0"
+                          flat
+                          style="margin-bottom: 1px"
+                        >
+                          <q-tooltip class="bg-grey-8"
+                            >If you want to PromptPal create your outline, click
+                            the "PromptPal" button</q-tooltip
+                          >
+                        </q-btn>
+                      </div>
+                    </div>
+                    <q-input
+                      placeholder="Paste/type your outline here"
+                      v-model="input1"
+                      filled
+                      rows="11"
+                      type="textarea"
+                      class="q-mb-md"
+                    />
+                    <div class="row justify-end">
+                      <q-btn
+                        :disable="!input1"
+                        label="Download PowerPoint"
+                        color="secondary"
+                        @click="generatePPTX(input1)"
+                      />
+                    </div>
+                  </div>
+                </q-card-main>
+              </q-card-section>
             </q-card>
           </div>
         </div>
@@ -957,6 +1151,7 @@ import _startCase from "lodash/startCase";
 import _sortBy from "lodash/sortBy";
 import { useRouter } from "vue-router";
 import { marked } from "marked";
+import pptxgenjs from "../utils/pptx";
 import axios from "axios";
 
 export default defineComponent({
@@ -999,6 +1194,7 @@ export default defineComponent({
     const menuExpLg = ref("");
     const searchVal = ref("");
     const menuExpSm = ref("");
+    const pptType = ref("ai");
     const fileRef = ref(null);
     const fileModel = ref(null);
     const affLink = ref(false);
@@ -1022,6 +1218,8 @@ export default defineComponent({
     const dev = "http://localhost:5000/prompt";
     const subMenusArr = subMenus.value;
     const subMenusCopy = ref(subMenusArr);
+
+    const activateGeneratePPTX = ["Create a Presentation"];
 
     const $q = useQuasar();
 
@@ -1053,7 +1251,7 @@ export default defineComponent({
           conversation.value = [...data];
           setTimeout(() => {
             scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
-          }, 801);
+          }, 900);
         }
       },
       { deep: true }
@@ -1369,14 +1567,38 @@ export default defineComponent({
         });
         sse.addEventListener("error", async ({ data }) => {
           let currentConvo = conversation.value.find((c) => c.date === date);
-          await addConversation(
-            {
-              role: "assistant",
-              content: currentConvo.content,
-              date,
-            },
-            user.value.id
-          );
+          if (currentConvo.content.length > 250) {
+            const parsed = marked.parse(currentConvo.content);
+            currentConvo.content =
+              "formatting the result for you, please wait...";
+
+            setTimeout(async () => {
+              currentConvo.content = parsed;
+              await addConversation(
+                {
+                  role: "assistant",
+                  content: parsed,
+                  generatePptx: activateGeneratePPTX.includes(
+                    selectedPrompt.value.label
+                  ),
+                  date,
+                },
+                user.value.id
+              );
+            }, 1500);
+          } else {
+            await addConversation(
+              {
+                role: "assistant",
+                content: currentConvo.content,
+                generatePptx: activateGeneratePPTX.includes(
+                  selectedPrompt.value.label
+                ),
+                date,
+              },
+              user.value.id
+            );
+          }
 
           updatefileConvo(sourceId.value, {
             role: "user",
@@ -1480,6 +1702,9 @@ export default defineComponent({
             conversation.value.push({
               role: "assistant",
               content: msgObj.text,
+              generatePptx: activateGeneratePPTX.includes(
+                selectedPrompt.value.label
+              ),
               date,
             });
           else {
@@ -1503,6 +1728,9 @@ export default defineComponent({
                 {
                   role: "assistant",
                   content: parsed,
+                  generatePptx: activateGeneratePPTX.includes(
+                    selectedPrompt.value.label
+                  ),
                   date,
                 },
                 user.value.id
@@ -1514,6 +1742,9 @@ export default defineComponent({
               {
                 role: "assistant",
                 content: currentConvo.content,
+                generatePptx: activateGeneratePPTX.includes(
+                  selectedPrompt.value.label
+                ),
                 date,
               },
               user.value.id
@@ -1566,6 +1797,9 @@ export default defineComponent({
             conversation.value.push({
               role: "assistant",
               content: msgObj.text,
+              generatePptx: activateGeneratePPTX.includes(
+                selectedPrompt.value.label
+              ),
               date,
             });
           else {
@@ -1575,21 +1809,46 @@ export default defineComponent({
 
           i++;
         });
-        sse.addEventListener("error", ({ data }) => {
+        sse.addEventListener("error", async ({ data }) => {
           let currentConvo = conversation.value.find((c) => c.date === date);
 
           if (currentConvo.content.length > 150) {
             const parsed = marked.parse(currentConvo.content);
-            currentConvo.content = "parsing the result for you, please wait...";
+            currentConvo.content =
+              "formatting the result for you, please wait...";
 
-            setTimeout(() => {
+            setTimeout(async () => {
               currentConvo.content = parsed;
-              loadingReg.value = false;
+              await addConversation(
+                {
+                  role: "assistant",
+                  content: parsed,
+                  generatePptx: activateGeneratePPTX.includes(
+                    selectedPrompt.value.label
+                  ),
+                  date,
+                },
+                user.value.id
+              );
+              loading.value = false;
             }, 1500);
           } else {
-            loadingReg.value = false;
+            await addConversation(
+              {
+                role: "assistant",
+                content: currentConvo.content,
+                generatePptx: activateGeneratePPTX.includes(
+                  selectedPrompt.value.label
+                ),
+                date,
+              },
+              user.value.id
+            );
+            loading.value = false;
           }
 
+          regenerateVal.value = prompt.value;
+          prompt.value = "";
           sse.close();
         });
 
@@ -1682,12 +1941,18 @@ export default defineComponent({
       }, 450);
     }
 
+    function sanitizeContent(text) {
+      let removeHTMLTags;
+      let finalText;
+      removeHTMLTags = text.replace(/<\/?[^>]+>/gi, "");
+      removeHTMLTags = removeHTMLTags.replace(/&quot;/g, '"');
+      finalText = removeHTMLTags.replace(/&#39;/g, "'");
+      return finalText;
+    }
+
     async function copyText(text) {
       try {
-        let removeHTMLTags;
-        removeHTMLTags = text.replace(/<\/?[^>]+>/gi, "");
-        removeHTMLTags = removeHTMLTags.replace(/&quot;/g, '"');
-        removeHTMLTags = removeHTMLTags.replace(/&#39;/g, "'");
+        let removeHTMLTags = sanitizeContent(text);
 
         await copyToClipboard(removeHTMLTags);
         $q.notify({
@@ -1735,6 +2000,30 @@ export default defineComponent({
         content: `You set the type to ${val} only`,
       });
       chatType.value = val;
+
+      if (val == "presentation")
+        setPrompt({
+          label: "Create a Presentation",
+          type: "Copy Creator",
+          title: "Create a Presentation",
+          prompt:
+            "You are one of the most engaging presenters in the world and a renowned global expert when it comes to [describe the subject area]. Please provide me with detailed content for an educational PowerPoint presentation. I will need a title page and a series of slides. Please label each page as either ‘Title Page’ or ‘Slide 1’ for example. Please include the title of each slide directly after the slide number. Please do not provide any introductory notes or explanatory notes, but rather just the content that has been requested. It is critical to not show the words ‘Title:’ and ‘Content:’. It is critical that the content is formatted so that it is on a separate line from the title. I do not want suggestions on what I should talk about, but rather just the exact content that will be included in the PowerPoint presentation. The presentation needs to be about [what is the presentation about]. Can you please make the presentation [enter the required number of slides] slides long?",
+          inputs: [
+            {
+              hint: "mathematics",
+              keyword: "describe the subject area",
+            },
+            {
+              hint: "distributive law and the index laws to factorise algebraic expressions",
+              keyword: "what is the presentation about",
+            },
+            {
+              hint: "10",
+              keyword: "enter the required number of slides",
+            },
+          ],
+        });
+      else setPrompt("", false);
 
       setTimeout(() => {
         scrollRef.value.scrollTo(conversation.value.length - 1, "smooth");
@@ -1803,6 +2092,113 @@ export default defineComponent({
       }
     }
 
+    function checkFileType(files) {
+      return files.filter((file) => file.type === "pdf");
+    }
+
+    function onRejected(rejectedEntries) {
+      $q.notify({
+        type: "negative",
+        position: "top-right",
+        message: `${rejectedEntries[0].file.name} is not a PDF file`,
+      });
+    }
+
+    function generatePPTX(val) {
+      let pptx = new pptxgenjs();
+
+      let content = sanitizeContent(val);
+      content = content.split("\n");
+      let slide, slideTitle;
+      let slideContent = [];
+      content.forEach((line) => {
+        if (line.startsWith("Title Page:")) {
+          slide = pptx.addSlide();
+          slide.addText(
+            [
+              {
+                text: line.replace("Title Page:", "").trim(),
+                options: { fontSize: 36, bold: true, underline: true },
+              },
+            ],
+            { x: 0.5, y: 0.5, w: "80%", h: 1.0 }
+          );
+        } else if (line.startsWith("Slide")) {
+          if (slide) {
+            if (slideTitle) {
+              slide.addText(
+                [
+                  {
+                    text: slideTitle,
+                    options: { fontSize: 24, bold: true, underline: true },
+                  },
+                ],
+                { x: 0.5, y: 0.5, w: "80%", h: 1.0 }
+              );
+            }
+            if (slideContent && slideContent.length > 0) {
+              slideContent = slideContent.map((item) => ({
+                text: item,
+                options: { bullet: true },
+              }));
+              slide.addText(slideContent, { x: 0.5, y: 1.5, w: "80%", h: 4.5 });
+            }
+          }
+          slide = pptx.addSlide();
+          slideTitle = line.substring(line.indexOf(":") + 1).trim();
+          slideContent = [];
+        } else if (line.startsWith("Title:")) {
+          slideTitle = line.substring(line.indexOf(":") + 1).trim();
+        } else if (line.startsWith("Content:")) {
+          slideContent = [];
+        } else if (line.trim().length > 0) {
+          const sentences = line.trim().split(/(?<=[.!?])/);
+          for (const sentence of sentences) {
+            const formattedSentence = sentence.trim();
+            if (formattedSentence.length > 0) {
+              slideContent.push(formattedSentence);
+            }
+          }
+        }
+      });
+
+      if (slide) {
+        if (slideTitle) {
+          slide.addText(
+            [
+              {
+                text: slideTitle,
+                options: { fontSize: 24, bold: true, underline: true },
+              },
+            ],
+            { x: 0.5, y: 0.5, w: "80%", h: 1.0 }
+          );
+        }
+        if (slideContent && slideContent.length > 0) {
+          slideContent = slideContent.map((item) => ({
+            text: item,
+            options: { bullet: true },
+          }));
+          slide.addText(slideContent, { x: 0.5, y: 1.5, w: "80%", h: 4.5 });
+        }
+      }
+
+      pptx.writeFile("presentation.pptx").then(() => {
+        $q.notify({
+          type: "positive",
+          position: "top-right",
+          message: "Your presentation is ready to download!",
+        });
+      });
+    }
+
+    function setPptType(val) {
+      pptType.value = val;
+      input1.value = "";
+      input2.value = "";
+      input3.value = "";
+    }
+
     return {
       user,
       menus,
@@ -1813,6 +2209,7 @@ export default defineComponent({
       input4,
       input5,
       active,
+      pptType,
       _sortBy,
       loading,
       affLink,
@@ -1835,9 +2232,11 @@ export default defineComponent({
       setHeight,
       searchVal,
       fileModel,
+      setPptType,
       askChatPDF,
       loadingReg,
       _startCase,
+      onRejected,
       archiveChat,
       setChatType,
       setSourceId,
@@ -1846,6 +2245,7 @@ export default defineComponent({
       expMenuItem,
       startTourSm,
       selectedMenu,
+      generatePPTX,
       conversation,
       submitPrompt,
       uploadingFile,
@@ -1853,6 +2253,7 @@ export default defineComponent({
       expMenuItemSm,
       affiliateLink,
       regenerateVal,
+      checkFileType,
       typeWriterText,
       selectedPrompt,
       expSubmenuItem,

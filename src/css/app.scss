@@ -47,23 +47,23 @@
 
 /* width */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 8px;
+  height: 8px;
 }
 
 /* Track */
 ::-webkit-scrollbar-track {
-  background: #fff;
+  background: lighten(#e7e5b7, 13);
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: #e7e5b7;
+  background: darken(#e7e5b7, 10);
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: darken(#e7e5b7, 10);
+  background: darken(#e7e5b7, 20);
 }
 
 #chat-messages > * {
@@ -158,7 +158,7 @@
   }
 }
 .terms-privacy-height {
-  height: 700px;
+  height: 650px;
   max-height: 900px;
 }
 

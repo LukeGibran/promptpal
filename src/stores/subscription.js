@@ -64,9 +64,11 @@ export const useSubStore = defineStore("subscription", {
                 let price = {
                   priceId: doc.id,
                   priceData: doc.data(),
-                  price: `$${doc.data().unit_amount / 100} ${doc
-                    .data()
-                    .currency.toUpperCase()} / ${doc.data().interval}`,
+                  price: doc.data()?.interval
+                    ? `$${doc.data().unit_amount / 100} ${doc
+                        .data()
+                        .currency.toUpperCase()} / ${doc.data().interval}`
+                    : `$${doc.data().unit_amount / 100}`,
                   // price: `${new Intl.NumberFormat("en-US", {
                   //   style: "currency",
                   //   currency: doc.data().currency,

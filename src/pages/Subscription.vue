@@ -409,6 +409,7 @@ export default defineComponent({
 
 .subscription-header {
   background: rgb(231, 229, 183);
+  min-height: 300px;
   background: linear-gradient(
     0deg,
     rgba(231, 229, 183, 1) 0%,

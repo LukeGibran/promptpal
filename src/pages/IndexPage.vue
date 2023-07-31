@@ -2093,7 +2093,10 @@ export default defineComponent({
     }
 
     function checkFileType(files) {
-      return files.filter((file) => file.type === "pdf");
+      return files.filter((file) => {
+        const accepted = ["pdf", "application/pdf"];
+        return accepted.includes(file.type.toLowerCase());
+      });
     }
 
     function onRejected(rejectedEntries) {
